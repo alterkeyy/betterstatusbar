@@ -1,6 +1,6 @@
 # Implementation Plan: Built-in System Actions for Gestures
 
-## Phase 1: Revamp Settings UI
+## Phase 1: Revamp Settings UI [checkpoint: da3c6b3]
 - [x] Task: Create Built-in Action Constants [0986eb9]
     - [ ] Update `Prefs.java` with predefined string constants for the new `system:` actions (e.g., `ACTION_SYSTEM_DARK_MODE`, `ACTION_SYSTEM_POWER_SAVE`, `ACTION_SYSTEM_LOCK_SCREEN`).
 - [x] Task: Refactor `SettingsActivity.java` Dialog [800fd08]
