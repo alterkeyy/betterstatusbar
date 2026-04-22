@@ -9,7 +9,7 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: apply icon**
+- [x] **Track: apply icon**
   *Link: [./tracks/apply_icon_20260422/](./tracks/apply_icon_20260422/)*
 
 ---
