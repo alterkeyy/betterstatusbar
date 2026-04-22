@@ -9,3 +9,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
+- [ ] **Track: change advanced gestures setting, default add "intent:", so the user just input pkg/activity**
+  *Link: [./tracks/gesture_intent_config_20260422/](./tracks/gesture_intent_config_20260422/)*
+
+---
+
