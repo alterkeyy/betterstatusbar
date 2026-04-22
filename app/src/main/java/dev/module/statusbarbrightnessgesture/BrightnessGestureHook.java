@@ -14,6 +14,7 @@ import android.os.Looper;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.WindowManager;
 import android.widget.TextView;
@@ -29,17 +30,6 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 /**
  * LSPosed module — status bar brightness gesture.
- *
- * Hooking: findHookMethod() reflects into XposedBridge at runtime to bypass
- * LSPosed's obfuscation of hookMethod().
- *
- * Prefs: broadcast approach.
- *   - SettingsActivity writes to SharedPreferences and sends a targeted
- *     broadcast to com.android.systemui with the new values as extras.
- *   - Hook registers a BroadcastReceiver inside SystemUI from onAttachedToWindow —
- *     guaranteed safe timing, no race condition.
- *   - SettingsActivity also re-sends on onResume() so values survive SystemUI restarts.
- *   - No permissions needed.
  */
 @SuppressWarnings({"JavaReflectionMemberAccess", "ConstantConditions"})
 public class BrightnessGestureHook implements IXposedHookLoadPackage {
@@ -64,6 +54,7 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
 
     private float mDownX;
     private float mDownY;
+    private float mInitialBrightness;
     private boolean mGestureActive = false;
     private boolean mTouchStartedInStatusBar = false;
 
@@ -97,11 +88,17 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
     private boolean mIndicatorAttached = false;
     private final Runnable mDismissIndicator = this::hideIndicator;
 
+    // ── Action Management ─────────────────────────────────────────────────────
+
+    private final StatusBarActionManager mActionManager = new StatusBarActionManager();
+    private StatusBarGestureDetector mGestureDetector;
+
     // ── Prefs ─────────────────────────────────────────────────────────────────
 
     private boolean mReceiverRegistered = false;
     private volatile boolean mGestureEnabled = true;
     private volatile boolean mOverlayEnabled  = true;
+    private volatile boolean mRelativeEnabled = false;
 
     // ── Entry point ───────────────────────────────────────────────────────────
 
@@ -125,8 +122,6 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
                 lpparam.classLoader, hookMethodFn);
     }
 
-    // ── Runtime reflection to find LSPosed's real hookMethod ──────────────────
-
     private Method findHookMethod() {
         for (Method m : XposedBridge.class.getDeclaredMethods()) {
             Class<?>[] params = m.getParameterTypes();
@@ -139,8 +134,6 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
         }
         return null;
     }
-
-    // ── onAttachedToWindow — register receiver and init resources ─────────────
 
     private void hookAttachedToWindow(String className, ClassLoader classLoader,
                                       Method hookMethodFn) {
@@ -167,38 +160,26 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
         }
     }
 
-    // ── Broadcast receiver for prefs ──────────────────────────────────────────
-
     private void registerPrefsReceiver(Context context) {
         if (mReceiverRegistered) return;
         mReceiverRegistered = true;
 
-        // Read persisted state from Settings.Secure on boot — available immediately,
-        // no app process needed, survives reboots.
-        // Falls back to true (enabled) if the key doesn't exist yet.
-        try {
-            mGestureEnabled = Settings.Secure.getInt(context.getContentResolver(),
-                    Prefs.KEY_GESTURE_ENABLED, Prefs.DEFAULT_GESTURE_ENABLED) == 1;
-            mOverlayEnabled = Settings.Secure.getInt(context.getContentResolver(),
-                    Prefs.KEY_OVERLAY_ENABLED, Prefs.DEFAULT_OVERLAY_ENABLED) == 1;
-            XposedBridge.log(TAG + ": boot state from Settings.Secure — gesture="
-                    + mGestureEnabled + " overlay=" + mOverlayEnabled);
-        } catch (Throwable t) {
-            mGestureEnabled = true;
-            mOverlayEnabled  = true;
-            XposedBridge.log(TAG + ": Settings.Secure read failed, defaulting to true: " + t);
-        }
+        updatePrefsFromContext(context);
 
-        // Broadcast receiver for live updates when user changes a toggle
         BroadcastReceiver receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context ctx, Intent intent) {
                 if (!Prefs.ACTION_PREFS_CHANGED.equals(intent.getAction())) return;
                 boolean prevGesture = mGestureEnabled;
+                
                 mGestureEnabled = intent.getBooleanExtra(Prefs.KEY_GESTURE_ENABLED, true);
                 mOverlayEnabled  = intent.getBooleanExtra(Prefs.KEY_OVERLAY_ENABLED,  true);
-                XposedBridge.log(TAG + ": prefs updated via broadcast — gesture="
-                        + mGestureEnabled + " overlay=" + mOverlayEnabled);
+                mRelativeEnabled = intent.getBooleanExtra(Prefs.KEY_RELATIVE_BRIGHTNESS, false);
+
+                // Update Actions
+                updateActionsFromIntent(intent);
+
+                XposedBridge.log(TAG + ": prefs updated via broadcast");
                 if (prevGesture && !mGestureEnabled && mIndicatorAttached) {
                     hideIndicator();
                 }
@@ -210,11 +191,63 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
         XposedBridge.log(TAG + ": prefs receiver registered");
     }
 
-    // ── Touch hook setup ──────────────────────────────────────────────────────
+    private void updatePrefsFromContext(Context context) {
+        try {
+            mGestureEnabled = Settings.Secure.getInt(context.getContentResolver(),
+                    Prefs.KEY_GESTURE_ENABLED, Prefs.DEFAULT_GESTURE_ENABLED) == 1;
+            mOverlayEnabled = Settings.Secure.getInt(context.getContentResolver(),
+                    Prefs.KEY_OVERLAY_ENABLED, Prefs.DEFAULT_OVERLAY_ENABLED) == 1;
+            mRelativeEnabled = Settings.Secure.getInt(context.getContentResolver(),
+                    Prefs.KEY_RELATIVE_BRIGHTNESS, Prefs.DEFAULT_RELATIVE_BRIGHTNESS) == 1;
+
+            updateActionsFromSecureSettings(context);
+        } catch (Throwable t) {
+            XposedBridge.log(TAG + ": updatePrefsFromContext failed: " + t);
+        }
+    }
+
+    private void updateActionsFromIntent(Intent intent) {
+        // Battery
+        mActionManager.updateAction(StatusBarActionManager.Area.BATTERY, StatusBarGestureDetector.GestureType.SINGLE_TAP, intent.getStringExtra(Prefs.KEY_BATTERY_SINGLE_TAP_ACTION));
+        mActionManager.updateAction(StatusBarActionManager.Area.BATTERY, StatusBarGestureDetector.GestureType.DOUBLE_TAP, intent.getStringExtra(Prefs.KEY_BATTERY_DOUBLE_TAP_ACTION));
+        mActionManager.updateAction(StatusBarActionManager.Area.BATTERY, StatusBarGestureDetector.GestureType.LONG_TAP,   intent.getStringExtra(Prefs.KEY_BATTERY_LONG_TAP_ACTION));
+
+        // Time
+        mActionManager.updateAction(StatusBarActionManager.Area.TIME, StatusBarGestureDetector.GestureType.SINGLE_TAP, intent.getStringExtra(Prefs.KEY_TIME_SINGLE_TAP_ACTION));
+        mActionManager.updateAction(StatusBarActionManager.Area.TIME, StatusBarGestureDetector.GestureType.DOUBLE_TAP, intent.getStringExtra(Prefs.KEY_TIME_DOUBLE_TAP_ACTION));
+        mActionManager.updateAction(StatusBarActionManager.Area.TIME, StatusBarGestureDetector.GestureType.LONG_TAP,   intent.getStringExtra(Prefs.KEY_TIME_LONG_TAP_ACTION));
+
+        // Background
+        mActionManager.updateAction(StatusBarActionManager.Area.BACKGROUND, StatusBarGestureDetector.GestureType.SINGLE_TAP, intent.getStringExtra(Prefs.KEY_STATUSBAR_SINGLE_TAP_ACTION));
+        mActionManager.updateAction(StatusBarActionManager.Area.BACKGROUND, StatusBarGestureDetector.GestureType.DOUBLE_TAP, intent.getStringExtra(Prefs.KEY_STATUSBAR_DOUBLE_TAP_ACTION));
+        mActionManager.updateAction(StatusBarActionManager.Area.BACKGROUND, StatusBarGestureDetector.GestureType.LONG_TAP,   intent.getStringExtra(Prefs.KEY_STATUSBAR_LONG_TAP_ACTION));
+    }
+
+    private void updateActionsFromSecureSettings(Context context) {
+        // Battery
+        mActionManager.updateAction(StatusBarActionManager.Area.BATTERY, StatusBarGestureDetector.GestureType.SINGLE_TAP, getStringSafe(context, Prefs.KEY_BATTERY_SINGLE_TAP_ACTION, Prefs.DEFAULT_ACTION_BATTERY_TAP));
+        mActionManager.updateAction(StatusBarActionManager.Area.BATTERY, StatusBarGestureDetector.GestureType.DOUBLE_TAP, getStringSafe(context, Prefs.KEY_BATTERY_DOUBLE_TAP_ACTION, ""));
+        mActionManager.updateAction(StatusBarActionManager.Area.BATTERY, StatusBarGestureDetector.GestureType.LONG_TAP,   getStringSafe(context, Prefs.KEY_BATTERY_LONG_TAP_ACTION, ""));
+
+        // Time
+        mActionManager.updateAction(StatusBarActionManager.Area.TIME, StatusBarGestureDetector.GestureType.SINGLE_TAP, getStringSafe(context, Prefs.KEY_TIME_SINGLE_TAP_ACTION, Prefs.DEFAULT_ACTION_TIME_TAP));
+        mActionManager.updateAction(StatusBarActionManager.Area.TIME, StatusBarGestureDetector.GestureType.DOUBLE_TAP, getStringSafe(context, Prefs.KEY_TIME_DOUBLE_TAP_ACTION, ""));
+        mActionManager.updateAction(StatusBarActionManager.Area.TIME, StatusBarGestureDetector.GestureType.LONG_TAP,   getStringSafe(context, Prefs.KEY_TIME_LONG_TAP_ACTION, ""));
+
+        // Background
+        mActionManager.updateAction(StatusBarActionManager.Area.BACKGROUND, StatusBarGestureDetector.GestureType.SINGLE_TAP, getStringSafe(context, Prefs.KEY_STATUSBAR_SINGLE_TAP_ACTION, ""));
+        mActionManager.updateAction(StatusBarActionManager.Area.BACKGROUND, StatusBarGestureDetector.GestureType.DOUBLE_TAP, getStringSafe(context, Prefs.KEY_STATUSBAR_DOUBLE_TAP_ACTION, ""));
+        mActionManager.updateAction(StatusBarActionManager.Area.BACKGROUND, StatusBarGestureDetector.GestureType.LONG_TAP,   getStringSafe(context, Prefs.KEY_STATUSBAR_LONG_TAP_ACTION, ""));
+    }
+
+    private String getStringSafe(Context context, String key, String def) {
+        String val = Settings.Secure.getString(context.getContentResolver(), key);
+        return val != null ? val : def;
+    }
 
     private void hookTouchTarget(String className, String methodName,
                                  ClassLoader classLoader, Method hookMethodFn,
-                                 boolean isStatusBarView) {
+                                 final boolean isStatusBarView) {
         try {
             Class<?> cls = Class.forName(className, false, classLoader);
             Method target = cls.getDeclaredMethod(methodName, MotionEvent.class);
@@ -232,8 +265,8 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
                             XposedBridge.log(TAG + ": display init failed: " + t);
                         }
                     }
-                    if (!mGestureEnabled) return;
-                    if (handleTouchEvent(ev, isStatusBarView)) {
+
+                    if (handleTouchEvent(ev, isStatusBarView, (View) param.thisObject)) {
                         param.setResult(true);
                     }
                 }
@@ -247,8 +280,6 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
             XposedBridge.log(TAG + ": hook failed for " + className + ": " + t);
         }
     }
-
-    // ── Display resource initialisation ──────────────────────────────────────
 
     private void initDisplayResources(Context context) {
         try {
@@ -285,15 +316,36 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
                 XposedBridge.log(TAG + ": BrightnessUtils not found, using fallback");
             }
 
+            if (mGestureDetector == null) {
+                mGestureDetector = new StatusBarGestureDetector(context, (view, ev, type) -> {
+                    mActionManager.handleGesture(context, findTappedView(view, ev.getX(), ev.getY()), type);
+                });
+            }
+
             readBrightnessRange();
             initIndicator(context);
 
-            XposedBridge.log(TAG + ": display init — screen=" + mScreenWidth
-                    + "x" + mScreenHeight
-                    + " range=[" + mBrightnessMin + ", " + mBrightnessMax + "]");
+            XposedBridge.log(TAG + ": display init complete");
         } catch (Throwable t) {
             XposedBridge.log(TAG + ": initDisplayResources failed: " + t);
         }
+    }
+
+    private View findTappedView(View root, float x, float y) {
+        if (!(root instanceof android.view.ViewGroup)) {
+            return root;
+        }
+        android.view.ViewGroup group = (android.view.ViewGroup) root;
+        for (int i = group.getChildCount() - 1; i >= 0; i--) {
+            View child = group.getChildAt(i);
+            if (child.getVisibility() != View.VISIBLE) continue;
+            float childX = x - child.getLeft();
+            float childY = y - child.getTop();
+            if (childX >= 0 && childX < child.getWidth() && childY >= 0 && childY < child.getHeight()) {
+                return findTappedView(child, childX, childY);
+            }
+        }
+        return root;
     }
 
     private void readBrightnessRange() {
@@ -316,8 +368,6 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
             XposedBridge.log(TAG + ": readBrightnessRange fallback: " + t);
         }
     }
-
-    // ── Indicator ─────────────────────────────────────────────────────────────
 
     private void initIndicator(Context context) {
         try {
@@ -432,10 +482,13 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
         }).start();
     }
 
-    // ── Touch routing ─────────────────────────────────────────────────────────
-
-    private boolean handleTouchEvent(MotionEvent ev, boolean isStatusBarView) {
+    private boolean handleTouchEvent(MotionEvent ev, boolean isStatusBarView, View view) {
         if (mDisplayManager == null || mScreenWidth == 0) return false;
+
+        if (mGestureDetector != null) {
+            mGestureDetector.onTouchEvent(view, ev);
+        }
+
         switch (ev.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:   return onDown(ev, isStatusBarView);
             case MotionEvent.ACTION_MOVE:   return onMove(ev);
@@ -454,11 +507,14 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
         mTouchStartedInStatusBar = true;
         mDownX = ev.getX();
         mDownY = ev.getY();
+        mInitialBrightness = getCurrentBrightness();
         return false;
     }
 
     private boolean onMove(MotionEvent ev) {
         if (!mTouchStartedInStatusBar) return false;
+        if (!mGestureEnabled) return false;
+
         float absDX = Math.abs(ev.getX() - mDownX);
         float absDY = Math.abs(ev.getY() - mDownY);
         if (!mGestureActive) {
@@ -472,7 +528,10 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
     }
 
     private boolean onUpOrCancel(MotionEvent ev) {
-        if (!mGestureActive) { mTouchStartedInStatusBar = false; return false; }
+        if (!mGestureActive) {
+            mTouchStartedInStatusBar = false;
+            return false;
+        }
         boolean cancelled = ev.getActionMasked() == MotionEvent.ACTION_CANCEL;
         float finalBrightness = cancelled
                 ? getCurrentBrightness()
@@ -486,18 +545,16 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
         return true;
     }
 
-    // ── Brightness computation ────────────────────────────────────────────────
-
     private float computeBrightness(float fingerX) {
         if (mBrightnessMin < 0) readBrightnessRange();
-        float fraction = Math.max(0f, Math.min(1f, fingerX / mScreenWidth));
-        float gammaCorrected = (float) Math.pow(fraction, GAMMA);
-        return Math.max(mBrightnessMin,
-                Math.min(mBrightnessMax,
-                        mBrightnessMin + gammaCorrected * (mBrightnessMax - mBrightnessMin)));
+        if (mRelativeEnabled) {
+            return BrightnessCalculator.computeRelativeBrightness(
+                    mInitialBrightness, mDownX, fingerX, mScreenWidth, mBrightnessMin, mBrightnessMax);
+        } else {
+            return BrightnessCalculator.computeAbsoluteBrightness(
+                    fingerX, mScreenWidth, mBrightnessMin, mBrightnessMax);
+        }
     }
-
-    // ── Hidden API calls ──────────────────────────────────────────────────────
 
     private void setTemporaryBrightness(float brightness) {
         if (mSetTemporaryBrightnessMethod == null) return;

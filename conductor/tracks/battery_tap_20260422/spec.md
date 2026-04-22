@@ -1,21 +1,38 @@
-# Specification: Battery Icon Tap to Settings
+# Specification: Extensible Status Bar Gestures
 
 ## Overview
-Implement a new feature that allows the user to tap the battery icon in the status bar to directly open the device's Battery Settings. The feature will be built with an extensible architecture to easily support additional status bar icons in the future.
+Implement a comprehensive gesture handling system for the status bar. This system will support single tap, double tap, and long tap gestures on both specific icons (e.g., battery) and empty areas of the status bar. Each gesture/area combination will be configurable to launch a specific activity or perform a system action.
 
 ## Functional Requirements
-- **Extensible Architecture:** Design a generic tap-handler system for status bar icons.
-- **Battery Tap Action:** Hook into the battery icon view specifically to launch the Android Battery Settings intent (`Intent.ACTION_POWER_USAGE_SUMMARY` or similar).
-- **Settings Toggle:** Add a new preference key (e.g., `KEY_BATTERY_TAP_ENABLED`) in `Prefs.java` and a corresponding switch in `SettingsActivity.java` to enable/disable the feature.
-- **Target Views:** The tap action will be active on the regular **Status Bar** (i.e., `PhoneStatusBarView`).
-- **Live Updates:** Ensure the setting toggle state is broadcasted to the Xposed hook without requiring a reboot, matching the existing `mRelativeEnabled` and `mGestureEnabled` behavior.
+- **Generic Gesture Detector:** Implement a detector for single tap, double tap, and long tap.
+- **Target Areas:**
+    - **Battery Icon:** Specific handling for the battery meter view.
+    - **Status Bar Background:** Handling for taps on empty areas (the `PhoneStatusBarView` itself).
+- **Configurable Actions:**
+    - Each gesture (Single/Double/Long Tap) on each area (Battery/Background) can be assigned an action.
+    - **Action Types:**
+        - Launch specific Activity (Package/Class name string).
+        - Open Battery Settings (Default for Battery tap).
+        - No Action (None).
+- **Settings UI:**
+    - Add UI to configure these assignments.
+    - Provide a way to input custom activity strings.
+- **Xposed Hook:**
+    - Intercept touches on `PhoneStatusBarView` and its children.
+    - Use the generic detector to identify gestures.
+    - Dispatch actions based on the configuration.
+
+## Technical Details
+- **Gesture Detection:** Use `android.view.GestureDetector` or a custom state machine to handle taps and double taps within the `onTouchEvent` hook.
+- **Action Execution:** Use `Context.startActivity` with appropriate flags for external intents.
+- **Preferences:** Use `Settings.Secure` for persistence and broadcasts for live updates.
 
 ## Acceptance Criteria
-- User can toggle the battery tap feature on/off in the companion app.
-- Tapping the battery icon on the status bar opens the battery settings when enabled.
-- The tap feature does not interfere with the existing horizontal brightness gesture.
-- The hook is structured to easily add more icons (e.g., Wi-Fi, Bluetooth) later.
+- User can configure separate actions for single, double, and long taps on the battery icon.
+- User can configure separate actions for single, double, and long taps on the empty status bar area.
+- Actions trigger correctly and launch the expected activities.
+- Gestures do not interfere with the existing brightness swipe gesture.
 
 ## Out of Scope
-- Implementing tap actions for icons other than the battery at this time.
-- Tap actions in the Notification Shade or on the Lockscreen status bar.
+- Gestures in the notification shade or lockscreen (for now).
+- Non-activity actions (e.g., toggle Wi-Fi) unless implemented as activity shortcuts.

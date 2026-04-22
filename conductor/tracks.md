@@ -9,5 +9,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: add an option to tap battary icon to goto battery setting**
+- [x] **Track: add an option to tap battary icon to goto battery setting**
   *Link: [./tracks/battery_tap_20260422/](./tracks/battery_tap_20260422/)*

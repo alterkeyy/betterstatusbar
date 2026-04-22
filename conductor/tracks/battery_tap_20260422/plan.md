@@ -1,33 +1,31 @@
-# Implementation Plan: Battery Icon Tap to Settings
+# Implementation Plan: Extensible Status Bar Gestures
 
-## Phase 1: Extensible Architecture and Settings UI
-- [ ] Task: Research Status Bar Icon Views
-    - [ ] Identify the class name for the Battery icon view in SystemUI.
-    - [ ] Identify how touch events are dispatched to status bar icons.
-- [ ] Task: Update Settings UI and Preferences
-    - [ ] Add `KEY_BATTERY_TAP_ENABLED` to `Prefs.java`.
-    - [ ] Add a new toggle to `SettingsActivity.java` for "Battery Icon Tap".
-    - [ ] Broadcast the new setting state to SystemUI in `sendPrefs()`.
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Extensible Architecture and Settings UI' (Protocol in workflow.md)
+## Phase 1: Preference and UI Overhaul
+- [x] Task: Update `Prefs.java`
+    - [x] Define keys for each gesture/area combination (e.g., `KEY_BATTERY_SINGLE_TAP`, `KEY_STATUSBAR_DOUBLE_TAP`, etc.).
+- [x] Task: Enhance `SettingsActivity.java`
+    - [x] Create a more modular UI for assigning actions to gestures.
+    - [x] Implement a way for users to enter custom activity intent strings.
+    - [x] Ensure all new settings are correctly broadcasted.
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Preference and UI Overhaul' (Protocol in workflow.md)
 
-## Phase 2: Tap Handler Implementation
-- [ ] Task: Design Generic Icon Tap Handler Interface
-    - [ ] Define an extensible interface/class for registering status bar icon tap handlers.
-    - [ ] Create a specific implementation for the Battery icon that launches the power usage intent.
-- [ ] Task: Hook Status Bar Icon Touches
-    - [ ] Hook into the appropriate view/controller in SystemUI to intercept clicks on icons.
-    - [ ] Route intercepted clicks through the generic tap handler.
-    - [ ] Ensure the tap handler only triggers if `mBatteryTapEnabled` is true.
-- [ ] Task: Verify Tap Handler with Automated Tests
-    - [ ] Write unit tests for the generic tap handler logic (if isolated from Android framework).
-    - [ ] Verify that the handler correctly identifies the battery icon and fires the intent.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Tap Handler Implementation' (Protocol in workflow.md)
+## Phase 2: Core Gesture Detection and Dispatch
+- [x] Task: Implement `StatusBarGestureDetector`
+    - [x] Create a custom class that handles single tap, double tap, and long tap detection.
+    - [x] Ensure it can distinguish between swipes (for brightness) and taps.
+- [x] Task: Refactor `IconTapManager` to `StatusBarActionManager`
+    - [x] Expand the manager to handle different gesture types.
+    - [x] Implement action execution logic (launching intents from strings).
+- [x] Task: Update `BrightnessGestureHook.java`
+    - [x] Integrate the new gesture detector into the `onTouchEvent` hook.
+    - [x] Pass identified gestures and target views to `StatusBarActionManager`.
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Core Gesture Detection and Dispatch' (Protocol in workflow.md)
 
-## Phase 3: Integration and Verification
-- [ ] Task: Verify Broadcast Propagation
-    - [ ] Ensure `SettingsActivity` correctly broadcasts the new setting.
-    - [ ] Ensure `BrightnessGestureHook` correctly receives and updates its local state.
-- [ ] Task: Manual Visual Verification
-    - [ ] Install and test on a physical/emulated device.
-    - [ ] Toggle battery tap mode and verify tapping the battery icon opens settings.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Integration and Verification' (Protocol in workflow.md)
+## Phase 3: Verification and Refinement
+- [x] Task: Write Tests for Gesture Logic
+    - [x] Create unit tests for identifying gestures from motion events.
+    - [x] Verify intent parsing and execution logic.
+- [x] Task: Final Manual Verification
+    - [x] Test all gesture combinations on a real device.
+    - [x] Verify that no regressions were introduced for the brightness swipe.
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Verification and Refinement' (Protocol in workflow.md)

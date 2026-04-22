@@ -28,4 +28,6 @@ android {
 dependencies {
     compileOnly(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation("com.google.android.material:material:1.12.0")
+    testImplementation(libs.junit)
+    testImplementation(libs.mockito.core)
 }

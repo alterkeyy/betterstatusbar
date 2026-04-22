@@ -1,7 +1,9 @@
 package dev.module.statusbarbrightnessgesture;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -10,10 +12,14 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 /**
  * Settings UI.
@@ -23,9 +29,6 @@ import android.widget.TextView;
  *
  * Requires WRITE_SECURE_SETTINGS — declared in manifest, granted once via ADB:
  *   adb shell pm grant dev.module.statusbarbrightnessgesture android.permission.WRITE_SECURE_SETTINGS
- *
- * Also sends a broadcast on every change and resume so the hook updates
- * immediately without needing to read Settings.Secure again.
  */
 @SuppressWarnings("deprecation")
 public class SettingsActivity extends Activity {
@@ -36,6 +39,12 @@ public class SettingsActivity extends Activity {
     private int colBackground;
     private int colDivider;
 
+    private Switch mGestureSw;
+    private Switch mOverlaySw;
+    private Switch mRelativeSw;
+
+    private SharedPreferences mPrefs;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         try {
@@ -45,6 +54,8 @@ public class SettingsActivity extends Activity {
 
         super.onCreate(savedInstanceState);
         resolveColours();
+        
+        mPrefs = getSharedPreferences("settings", Context.MODE_PRIVATE);
 
         float dp = getResources().getDisplayMetrics().density;
         int hPad = (int)(24*dp), vPad = (int)(20*dp);
@@ -87,16 +98,53 @@ public class SettingsActivity extends Activity {
         root.addView(divider(dp), matchWidth());
 
         // ── Toggles ───────────────────────────────────────────────────────────
-        buildToggleRow(root, "Enable gesture",
+        mGestureSw = buildToggleRow(root, "Enable gesture",
                 "Swipe left to dim, right to brighten",
                 Prefs.KEY_GESTURE_ENABLED, Prefs.DEFAULT_GESTURE_ENABLED,
                 dp, hPad, vPad);
         root.addView(divider(dp), matchWidth());
 
-        buildToggleRow(root, "Show brightness indicator",
+        mOverlaySw = buildToggleRow(root, "Show brightness indicator",
                 "Displays brightness % while swiping",
                 Prefs.KEY_OVERLAY_ENABLED, Prefs.DEFAULT_OVERLAY_ENABLED,
                 dp, hPad, vPad);
+        root.addView(divider(dp), matchWidth());
+
+        mRelativeSw = buildToggleRow(root, "Relative adjustment",
+                "Adjust relative to current value (experimental)",
+                Prefs.KEY_RELATIVE_BRIGHTNESS, Prefs.DEFAULT_RELATIVE_BRIGHTNESS,
+                dp, hPad, vPad);
+        root.addView(divider(dp), matchWidth());
+
+        // ── Advanced Gestures ────────────────────────────────────────────────
+        TextView advHeader = new TextView(this);
+        advHeader.setText("Advanced Gestures");
+        advHeader.setTextSize(14);
+        advHeader.setTypeface(Typeface.DEFAULT_BOLD);
+        advHeader.setTextColor(colTextSecondary);
+        advHeader.setPadding(hPad, (int)(24*dp), hPad, (int)(8*dp));
+        root.addView(advHeader);
+        root.addView(divider(dp), matchWidth());
+
+        buildActionRow(root, "Battery Single Tap", Prefs.KEY_BATTERY_SINGLE_TAP_ACTION, Prefs.DEFAULT_ACTION_BATTERY_TAP, dp, hPad, vPad);
+        root.addView(divider(dp), matchWidth());
+        buildActionRow(root, "Battery Double Tap", Prefs.KEY_BATTERY_DOUBLE_TAP_ACTION, "", dp, hPad, vPad);
+        root.addView(divider(dp), matchWidth());
+        buildActionRow(root, "Battery Long Tap", Prefs.KEY_BATTERY_LONG_TAP_ACTION, "", dp, hPad, vPad);
+        root.addView(divider(dp), matchWidth());
+
+        buildActionRow(root, "Time Single Tap", Prefs.KEY_TIME_SINGLE_TAP_ACTION, Prefs.DEFAULT_ACTION_TIME_TAP, dp, hPad, vPad);
+        root.addView(divider(dp), matchWidth());
+        buildActionRow(root, "Time Double Tap", Prefs.KEY_TIME_DOUBLE_TAP_ACTION, "", dp, hPad, vPad);
+        root.addView(divider(dp), matchWidth());
+        buildActionRow(root, "Time Long Tap", Prefs.KEY_TIME_LONG_TAP_ACTION, "", dp, hPad, vPad);
+        root.addView(divider(dp), matchWidth());
+
+        buildActionRow(root, "Status Bar Single Tap", Prefs.KEY_STATUSBAR_SINGLE_TAP_ACTION, "", dp, hPad, vPad);
+        root.addView(divider(dp), matchWidth());
+        buildActionRow(root, "Status Bar Double Tap", Prefs.KEY_STATUSBAR_DOUBLE_TAP_ACTION, "", dp, hPad, vPad);
+        root.addView(divider(dp), matchWidth());
+        buildActionRow(root, "Status Bar Long Tap", Prefs.KEY_STATUSBAR_LONG_TAP_ACTION, "", dp, hPad, vPad);
         root.addView(divider(dp), matchWidth());
 
         // ── How to use ────────────────────────────────────────────────────────
@@ -118,7 +166,8 @@ public class SettingsActivity extends Activity {
                 "• Works with notification shade open or closed",
                 "• Works on the lockscreen",
                 "• The % indicator matches the system brightness display",
-                "• Indicator colour follows your wallpaper accent"}) {
+                "• Indicator colour follows your wallpaper accent",
+                "• Configure tap actions in Advanced Gestures"}) {
             TextView t = new TextView(this);
             t.setText(tip);
             t.setTextSize(13);
@@ -137,7 +186,70 @@ public class SettingsActivity extends Activity {
         root.addView(note, matchWidth());
     }
 
-    private void buildToggleRow(LinearLayout root, String titleText, String descText,
+    private void buildActionRow(LinearLayout root, String label, String prefKey, String def, float dp, int hPad, int vPad) {
+        LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.VERTICAL);
+        row.setBackgroundColor(colSurface);
+        row.setPadding(hPad, (int)(12*dp), hPad, (int)(12*dp));
+        row.setGravity(Gravity.CENTER_VERTICAL);
+
+        TextView tv = new TextView(this);
+        tv.setText(label);
+        tv.setTextSize(16);
+        tv.setTextColor(colText);
+        row.addView(tv);
+
+        String current = mPrefs.getString(prefKey, def);
+        
+        TextView dv = new TextView(this);
+        dv.setText(current.isEmpty() ? "None" : current);
+        dv.setTextSize(13);
+        dv.setTextColor(colTextSecondary);
+        dv.setPadding(0, (int)(3*dp), 0, 0);
+        row.addView(dv);
+
+        row.setOnClickListener(v -> {
+            EditText input = new EditText(this);
+            input.setText(mPrefs.getString(prefKey, def));
+            input.setHint("intent:com.package/.ActivityName");
+            
+            LinearLayout container = new LinearLayout(this);
+            container.setPadding((int)(24*dp), (int)(16*dp), (int)(24*dp), 0);
+            container.addView(input, matchWidth());
+
+            new MaterialAlertDialogBuilder(this)
+                .setTitle("Set Action for " + label)
+                .setMessage("Enter an intent string (e.g., intent:action.NAME or intent:pkg/.Activity)")
+                .setView(container)
+                .setPositiveButton("Save", (dialog, which) -> {
+                    String val = input.getText().toString().trim();
+                    mPrefs.edit().putString(prefKey, val).apply();
+                    try {
+                        Settings.Secure.putString(getContentResolver(), prefKey, val);
+                    } catch (SecurityException e) {
+                        Toast.makeText(this, "Permission missing! Run ADB command.", Toast.LENGTH_LONG).show();
+                    }
+                    dv.setText(val.isEmpty() ? "None" : val);
+                    sendPrefs();
+                })
+                .setNegativeButton("Cancel", null)
+                .setNeutralButton("Clear", (dialog, which) -> {
+                    mPrefs.edit().putString(prefKey, "").apply();
+                    try {
+                        Settings.Secure.putString(getContentResolver(), prefKey, "");
+                    } catch (SecurityException e) {
+                        // ignore
+                    }
+                    dv.setText("None");
+                    sendPrefs();
+                })
+                .show();
+        });
+
+        root.addView(row, matchWidth());
+    }
+
+    private Switch buildToggleRow(LinearLayout root, String titleText, String descText,
                                 String prefKey, int defaultVal,
                                 float dp, int hPad, int vPad) {
         LinearLayout row = new LinearLayout(this);
@@ -167,15 +279,14 @@ public class SettingsActivity extends Activity {
         row.addView(textCol);
 
         Switch sw = new Switch(this);
-        int current = Settings.Secure.getInt(getContentResolver(), prefKey, defaultVal);
+        int current = mPrefs.getInt(prefKey, defaultVal);
         sw.setChecked(current == 1);
         sw.setOnCheckedChangeListener((CompoundButton b, boolean checked) -> {
+            mPrefs.edit().putInt(prefKey, checked ? 1 : 0).apply();
             try {
                 Settings.Secure.putInt(getContentResolver(), prefKey, checked ? 1 : 0);
             } catch (SecurityException e) {
-                // Permission not yet granted — toggle still works via broadcast
-                // Run: adb shell pm grant dev.module.statusbarbrightnessgesture
-                //          android.permission.WRITE_SECURE_SETTINGS
+                // ignore
             }
             sendPrefs();
         });
@@ -183,17 +294,37 @@ public class SettingsActivity extends Activity {
         row.setOnClickListener(v -> sw.toggle());
 
         root.addView(row, matchWidth());
+        return sw;
     }
 
     private void sendPrefs() {
         Intent intent = new Intent(Prefs.ACTION_PREFS_CHANGED);
         intent.setPackage("com.android.systemui");
-        intent.putExtra(Prefs.KEY_GESTURE_ENABLED,
-                Settings.Secure.getInt(getContentResolver(),
-                        Prefs.KEY_GESTURE_ENABLED, Prefs.DEFAULT_GESTURE_ENABLED) == 1);
-        intent.putExtra(Prefs.KEY_OVERLAY_ENABLED,
-                Settings.Secure.getInt(getContentResolver(),
-                        Prefs.KEY_OVERLAY_ENABLED, Prefs.DEFAULT_OVERLAY_ENABLED) == 1);
+        
+        boolean gesture = mGestureSw != null ? mGestureSw.isChecked() : 
+                mPrefs.getInt(Prefs.KEY_GESTURE_ENABLED, Prefs.DEFAULT_GESTURE_ENABLED) == 1;
+        boolean overlay = mOverlaySw != null ? mOverlaySw.isChecked() :
+                mPrefs.getInt(Prefs.KEY_OVERLAY_ENABLED, Prefs.DEFAULT_OVERLAY_ENABLED) == 1;
+        boolean relative = mRelativeSw != null ? mRelativeSw.isChecked() :
+                mPrefs.getInt(Prefs.KEY_RELATIVE_BRIGHTNESS, Prefs.DEFAULT_RELATIVE_BRIGHTNESS) == 1;
+
+        intent.putExtra(Prefs.KEY_GESTURE_ENABLED, gesture);
+        intent.putExtra(Prefs.KEY_OVERLAY_ENABLED, overlay);
+        intent.putExtra(Prefs.KEY_RELATIVE_BRIGHTNESS, relative);
+
+        // Strings
+        intent.putExtra(Prefs.KEY_BATTERY_SINGLE_TAP_ACTION, mPrefs.getString(Prefs.KEY_BATTERY_SINGLE_TAP_ACTION, Prefs.DEFAULT_ACTION_BATTERY_TAP));
+        intent.putExtra(Prefs.KEY_BATTERY_DOUBLE_TAP_ACTION, mPrefs.getString(Prefs.KEY_BATTERY_DOUBLE_TAP_ACTION, ""));
+        intent.putExtra(Prefs.KEY_BATTERY_LONG_TAP_ACTION,   mPrefs.getString(Prefs.KEY_BATTERY_LONG_TAP_ACTION, ""));
+
+        intent.putExtra(Prefs.KEY_TIME_SINGLE_TAP_ACTION, mPrefs.getString(Prefs.KEY_TIME_SINGLE_TAP_ACTION, Prefs.DEFAULT_ACTION_TIME_TAP));
+        intent.putExtra(Prefs.KEY_TIME_DOUBLE_TAP_ACTION, mPrefs.getString(Prefs.KEY_TIME_DOUBLE_TAP_ACTION, ""));
+        intent.putExtra(Prefs.KEY_TIME_LONG_TAP_ACTION,   mPrefs.getString(Prefs.KEY_TIME_LONG_TAP_ACTION, ""));
+        
+        intent.putExtra(Prefs.KEY_STATUSBAR_SINGLE_TAP_ACTION, mPrefs.getString(Prefs.KEY_STATUSBAR_SINGLE_TAP_ACTION, ""));
+        intent.putExtra(Prefs.KEY_STATUSBAR_DOUBLE_TAP_ACTION, mPrefs.getString(Prefs.KEY_STATUSBAR_DOUBLE_TAP_ACTION, ""));
+        intent.putExtra(Prefs.KEY_STATUSBAR_LONG_TAP_ACTION,   mPrefs.getString(Prefs.KEY_STATUSBAR_LONG_TAP_ACTION, ""));
+
         sendBroadcast(intent);
     }
 
@@ -255,7 +386,7 @@ public class SettingsActivity extends Activity {
 
     private LinearLayout.LayoutParams matchWidth() {
         return new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 }
