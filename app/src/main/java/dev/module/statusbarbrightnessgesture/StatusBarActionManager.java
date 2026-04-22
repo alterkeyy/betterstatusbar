@@ -143,14 +143,26 @@ public class StatusBarActionManager {
                 PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
                 if (powerManager == null) return false;
                 boolean isEnabled = powerManager.isPowerSaveMode();
+                boolean success = false;
+
+                // 1. Try Settings.Global (standard for many ROMs to trigger battery saver)
+                try {
+                    android.provider.Settings.Global.putInt(context.getContentResolver(), "low_power", !isEnabled ? 1 : 0);
+                    success = true;
+                } catch (Throwable e) {
+                    XposedBridge.log(TAG + ": Settings.Global failed for low_power: " + e);
+                }
+
+                // 2. Try reflection (SystemApi, more direct if supported)
                 try {
                     java.lang.reflect.Method setPowerSaveMode = powerManager.getClass().getMethod("setPowerSaveMode", boolean.class);
                     setPowerSaveMode.invoke(powerManager, !isEnabled);
-                    return true;
+                    success = true;
                 } catch (Throwable e) {
                     XposedBridge.log(TAG + ": reflection failed for setPowerSaveMode: " + e);
-                    return false;
                 }
+                
+                return success;
             } else if ("lock_screen".equals(systemAction)) {
                 PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
                 if (powerManager == null) return false;
