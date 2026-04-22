@@ -3,7 +3,7 @@
 ## Phase 1: Revamp Settings UI
 - [x] Task: Create Built-in Action Constants [0986eb9]
     - [ ] Update `Prefs.java` with predefined string constants for the new `system:` actions (e.g., `ACTION_SYSTEM_DARK_MODE`, `ACTION_SYSTEM_POWER_SAVE`, `ACTION_SYSTEM_LOCK_SCREEN`).
-- [ ] Task: Refactor `SettingsActivity.java` Dialog
+- [x] Task: Refactor `SettingsActivity.java` Dialog [800fd08]
     - [ ] Modify `buildActionRow` to display a single-choice list `AlertDialog` instead of the direct `EditText`.
     - [ ] Add the list options: None, Toggle Dark Mode, Toggle Power Saving, Lock Screen, Custom Intent...
     - [ ] Handle the selection: save predefined actions directly, or open the `EditText` dialog if "Custom Intent..." is chosen.
