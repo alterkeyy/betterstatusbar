@@ -19,7 +19,7 @@
     - [ ] Add logic to handle `system:toggle_power_save` using `PowerManager`.
     - [ ] Add logic to handle `system:lock_screen` using `PowerManager.goToSleep()` or `DevicePolicyManager`.
     - [ ] Ensure robust try-catch blocks around system API calls, logging any failures via `XposedBridge`.
-- [ ] Task: Update Unit Tests
+- [x] Task: Update Unit Tests [7215c94]
     - [ ] Modify `StatusBarActionManagerTest` to verify the parsing and execution logic of the new `system:` actions.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Implement System Action Logic' (Protocol in workflow.md)
 
