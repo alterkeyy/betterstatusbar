@@ -9,7 +9,7 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [~] **Track: Add built-in system actions (Dark Mode, Power Saving, Lock Screen) and a list selection UI.**
+- [x] **Track: Add built-in system actions (Dark Mode, Power Saving, Lock Screen) and a list selection UI.**
   *Link: [./tracks/system_actions_20260422/](./tracks/system_actions_20260422/)*
 
 ---
