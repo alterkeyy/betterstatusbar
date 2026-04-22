@@ -4,5 +4,3 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [x] **Track: Implement Relative Brightness Adjustment**
-  *Link: [./tracks/rel_bright_adj_20260422/](./tracks/rel_bright_adj_20260422/)*
