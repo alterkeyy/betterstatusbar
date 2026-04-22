@@ -23,7 +23,7 @@
     - [ ] Modify `StatusBarActionManagerTest` to verify the parsing and execution logic of the new `system:` actions.
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Implement System Action Logic' (Protocol in workflow.md) [73c545b]
 
-## Phase 3: Verification
+## Phase 3: Verification [checkpoint: 4bd6b76]
 - [x] Task: Final Manual Verification [73c545b]
     - [ ] Test the new UI flow in the settings app.
     - [ ] Trigger each built-in action via a gesture on a physical/emulated device.
