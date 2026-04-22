@@ -14,7 +14,7 @@
 - [x] Task: Update `StatusBarActionManager` parsing [b0c559c]
     - [ ] Add support for parsing the `system:` prefix.
     - [ ] Update the `ParsedIntent` or create a new return type to distinguish between standard intents and system actions.
-- [ ] Task: Implement `performSystemAction`
+- [x] Task: Implement `performSystemAction` [7215c94]
     - [ ] Add logic in `StatusBarActionManager` (or a dedicated class) to handle `system:toggle_dark_mode` using `UiModeManager`.
     - [ ] Add logic to handle `system:toggle_power_save` using `PowerManager`.
     - [ ] Add logic to handle `system:lock_screen` using `PowerManager.goToSleep()` or `DevicePolicyManager`.
