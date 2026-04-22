@@ -11,12 +11,12 @@ An LSPosed module designed for power users that allows seamless, gesture-based c
 
 ## Key Features (Current)
 - Horizontal swipe on the status bar to increase/decrease brightness.
+- **Relative Brightness Adjustment (Toggle):** Brightness can be adjusted relative to its current value from any starting position.
 - Functional with the notification shade open or closed, and on the lockscreen.
 - A dynamic brightness indicator that matches the system's accent color.
 - Configurable settings via the module's companion app (toggle gesture, toggle indicator).
 
 ## Planned Enhancements
-- **Relative Brightness Adjustment (Toggle):** Brightness should be adjustable by swiping from any position (relative adjustment), rather than jumping to the absolute value corresponding to the touch's specific horizontal position on the screen.
 - **Refined Haptics & Sensitivity:** Improve touch detection, adjust gesture slop, and add vibration responses for tactile feedback during the swipe.
 - **Status Bar Shortcuts:** Implement tap actions on status bar icons to jump directly to their respective settings pages (e.g., tapping the battery icon opens the battery settings).
 
