@@ -116,6 +116,19 @@ public class SettingsActivity extends Activity {
                 dp, hPad, vPad);
         root.addView(divider(dp), matchWidth());
 
+        // ── Haptics & Sensitivity ───────────────────────────────────────────
+        buildIntRow(root, "Haptic Intensity",
+                "0: None, 1: Subtle, 2: Normal, 3: Strong",
+                Prefs.KEY_HAPTIC_INTENSITY, Prefs.DEFAULT_HAPTIC_INTENSITY,
+                0, 3, dp, hPad, vPad);
+        root.addView(divider(dp), matchWidth());
+
+        buildIntRow(root, "Swipe Sensitivity",
+                "Multiplier for swipe distance to brightness change",
+                Prefs.KEY_SWIPE_SENSITIVITY, Prefs.DEFAULT_SWIPE_SENSITIVITY,
+                10, 500, dp, hPad, vPad);
+        root.addView(divider(dp), matchWidth());
+
         // ── Advanced Gestures ────────────────────────────────────────────────
         TextView advHeader = new TextView(this);
         advHeader.setText("Advanced Gestures");
@@ -184,6 +197,64 @@ public class SettingsActivity extends Activity {
         note.setGravity(Gravity.CENTER);
         note.setPadding(hPad, (int)(16*dp), hPad, (int)(16*dp));
         root.addView(note, matchWidth());
+    }
+
+    private void buildIntRow(LinearLayout root, String label, String desc, String prefKey, int defaultVal, int min, int max, float dp, int hPad, int vPad) {
+        LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.VERTICAL);
+        row.setBackgroundColor(colSurface);
+        row.setPadding(hPad, (int)(12*dp), hPad, (int)(12*dp));
+        row.setGravity(Gravity.CENTER_VERTICAL);
+
+        TextView tv = new TextView(this);
+        tv.setText(label);
+        tv.setTextSize(16);
+        tv.setTextColor(colText);
+        row.addView(tv);
+
+        int current = mPrefs.getInt(prefKey, defaultVal);
+        
+        TextView dv = new TextView(this);
+        dv.setText(desc + ": " + current + (prefKey.equals(Prefs.KEY_SWIPE_SENSITIVITY) ? "%" : ""));
+        dv.setTextSize(13);
+        dv.setTextColor(colTextSecondary);
+        dv.setPadding(0, (int)(3*dp), 0, 0);
+        row.addView(dv);
+
+        row.setOnClickListener(v -> {
+            EditText input = new EditText(this);
+            input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+            input.setText(String.valueOf(mPrefs.getInt(prefKey, defaultVal)));
+            
+            LinearLayout container = new LinearLayout(this);
+            container.setPadding((int)(24*dp), (int)(16*dp), (int)(24*dp), 0);
+            container.addView(input, matchWidth());
+
+            new MaterialAlertDialogBuilder(this)
+                .setTitle("Set " + label)
+                .setMessage("Enter a value between " + min + " and " + max)
+                .setView(container)
+                .setPositiveButton("Save", (dialog, which) -> {
+                    try {
+                        String s = input.getText().toString().trim();
+                        if (s.isEmpty()) return;
+                        int val = Integer.parseInt(s);
+                        val = Math.max(min, Math.min(max, val));
+                        mPrefs.edit().putInt(prefKey, val).apply();
+                        try {
+                            Settings.Secure.putInt(getContentResolver(), prefKey, val);
+                        } catch (SecurityException e) {
+                            Toast.makeText(this, "Permission missing! Run ADB command.", Toast.LENGTH_LONG).show();
+                        }
+                        dv.setText(desc + ": " + val + (prefKey.equals(Prefs.KEY_SWIPE_SENSITIVITY) ? "%" : ""));
+                        sendPrefs();
+                    } catch (NumberFormatException ignored) {}
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+        });
+
+        root.addView(row, matchWidth());
     }
 
     private void buildActionRow(LinearLayout root, String label, String prefKey, String def, float dp, int hPad, int vPad) {
@@ -311,6 +382,9 @@ public class SettingsActivity extends Activity {
         intent.putExtra(Prefs.KEY_GESTURE_ENABLED, gesture);
         intent.putExtra(Prefs.KEY_OVERLAY_ENABLED, overlay);
         intent.putExtra(Prefs.KEY_RELATIVE_BRIGHTNESS, relative);
+        
+        intent.putExtra(Prefs.KEY_HAPTIC_INTENSITY, mPrefs.getInt(Prefs.KEY_HAPTIC_INTENSITY, Prefs.DEFAULT_HAPTIC_INTENSITY));
+        intent.putExtra(Prefs.KEY_SWIPE_SENSITIVITY, mPrefs.getInt(Prefs.KEY_SWIPE_SENSITIVITY, Prefs.DEFAULT_SWIPE_SENSITIVITY));
 
         // Strings
         intent.putExtra(Prefs.KEY_BATTERY_SINGLE_TAP_ACTION, mPrefs.getString(Prefs.KEY_BATTERY_SINGLE_TAP_ACTION, Prefs.DEFAULT_ACTION_BATTERY_TAP));
