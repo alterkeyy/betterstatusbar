@@ -154,12 +154,14 @@ public class StatusBarActionManager {
                 }
 
                 // 2. Try reflection (SystemApi, more direct if supported)
-                try {
-                    java.lang.reflect.Method setPowerSaveMode = powerManager.getClass().getMethod("setPowerSaveMode", boolean.class);
-                    setPowerSaveMode.invoke(powerManager, !isEnabled);
-                    success = true;
-                } catch (Throwable e) {
-                    XposedBridge.log(TAG + ": reflection failed for setPowerSaveMode: " + e);
+                String[] methodNames = {"setPowerSaveMode", "setPowerSaveModeEnabled"};
+                for (String methodName : methodNames) {
+                    try {
+                        java.lang.reflect.Method m = powerManager.getClass().getMethod(methodName, boolean.class);
+                        m.invoke(powerManager, !isEnabled);
+                        success = true;
+                        break;
+                    } catch (Throwable ignored) {}
                 }
                 
                 return success;
