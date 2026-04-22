@@ -529,7 +529,7 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
         if (!mGestureActive) {
             if (absDX <= mGestureSlopPx || absDX <= absDY * HORIZONTAL_RATIO) return false;
             mGestureActive = true;
-            mHapticHandler.start(mDownX, mScreenWidth, mHapticIntensity);
+            mHapticHandler.start(view.getContext(), mDownX, mScreenWidth, mHapticIntensity);
         }
 
         mHapticHandler.update(view, ev.getX());

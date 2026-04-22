@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.slider.Slider;
 
 /**
  * Settings UI.
@@ -117,16 +118,16 @@ public class SettingsActivity extends Activity {
         root.addView(divider(dp), matchWidth());
 
         // ── Haptics & Sensitivity ───────────────────────────────────────────
-        buildIntRow(root, "Haptic Intensity",
-                "0: None, 1: Subtle, 2: Normal, 3: Strong",
+        buildSliderRow(root, "Haptic Intensity",
+                "Tactile feedback strength",
                 Prefs.KEY_HAPTIC_INTENSITY, Prefs.DEFAULT_HAPTIC_INTENSITY,
-                0, 3, dp, hPad, vPad);
+                0, 3, 1f, dp, hPad, vPad);
         root.addView(divider(dp), matchWidth());
 
-        buildIntRow(root, "Swipe Sensitivity",
-                "Multiplier for swipe distance to brightness change",
+        buildSliderRow(root, "Swipe Sensitivity",
+                "Gesture responsiveness",
                 Prefs.KEY_SWIPE_SENSITIVITY, Prefs.DEFAULT_SWIPE_SENSITIVITY,
-                10, 500, dp, hPad, vPad);
+                10, 500, 10f, dp, hPad, vPad);
         root.addView(divider(dp), matchWidth());
 
         // ── Advanced Gestures ────────────────────────────────────────────────
@@ -199,12 +200,11 @@ public class SettingsActivity extends Activity {
         root.addView(note, matchWidth());
     }
 
-    private void buildIntRow(LinearLayout root, String label, String desc, String prefKey, int defaultVal, int min, int max, float dp, int hPad, int vPad) {
+    private void buildSliderRow(LinearLayout root, String label, String desc, String prefKey, int defaultVal, float min, float max, float step, float dp, int hPad, int vPad) {
         LinearLayout row = new LinearLayout(this);
         row.setOrientation(LinearLayout.VERTICAL);
         row.setBackgroundColor(colSurface);
         row.setPadding(hPad, (int)(12*dp), hPad, (int)(12*dp));
-        row.setGravity(Gravity.CENTER_VERTICAL);
 
         TextView tv = new TextView(this);
         tv.setText(label);
@@ -212,48 +212,31 @@ public class SettingsActivity extends Activity {
         tv.setTextColor(colText);
         row.addView(tv);
 
-        int current = mPrefs.getInt(prefKey, defaultVal);
-        
         TextView dv = new TextView(this);
+        int current = mPrefs.getInt(prefKey, defaultVal);
         dv.setText(desc + ": " + current + (prefKey.equals(Prefs.KEY_SWIPE_SENSITIVITY) ? "%" : ""));
         dv.setTextSize(13);
         dv.setTextColor(colTextSecondary);
-        dv.setPadding(0, (int)(3*dp), 0, 0);
+        dv.setPadding(0, (int)(3*dp), 0, (int)(8*dp));
         row.addView(dv);
 
-        row.setOnClickListener(v -> {
-            EditText input = new EditText(this);
-            input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
-            input.setText(String.valueOf(mPrefs.getInt(prefKey, defaultVal)));
-            
-            LinearLayout container = new LinearLayout(this);
-            container.setPadding((int)(24*dp), (int)(16*dp), (int)(24*dp), 0);
-            container.addView(input, matchWidth());
-
-            new MaterialAlertDialogBuilder(this)
-                .setTitle("Set " + label)
-                .setMessage("Enter a value between " + min + " and " + max)
-                .setView(container)
-                .setPositiveButton("Save", (dialog, which) -> {
-                    try {
-                        String s = input.getText().toString().trim();
-                        if (s.isEmpty()) return;
-                        int val = Integer.parseInt(s);
-                        val = Math.max(min, Math.min(max, val));
-                        mPrefs.edit().putInt(prefKey, val).apply();
-                        try {
-                            Settings.Secure.putInt(getContentResolver(), prefKey, val);
-                        } catch (SecurityException e) {
-                            Toast.makeText(this, "Permission missing! Run ADB command.", Toast.LENGTH_LONG).show();
-                        }
-                        dv.setText(desc + ": " + val + (prefKey.equals(Prefs.KEY_SWIPE_SENSITIVITY) ? "%" : ""));
-                        sendPrefs();
-                    } catch (NumberFormatException ignored) {}
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
+        Slider slider = new Slider(this);
+        slider.setValueFrom(min);
+        slider.setValueTo(max);
+        slider.setStepSize(step);
+        slider.setValue((float)current);
+        
+        slider.addOnChangeListener((s, value, fromUser) -> {
+            int val = (int)value;
+            mPrefs.edit().putInt(prefKey, val).apply();
+            try {
+                Settings.Secure.putInt(getContentResolver(), prefKey, val);
+            } catch (SecurityException e) {}
+            dv.setText(desc + ": " + val + (prefKey.equals(Prefs.KEY_SWIPE_SENSITIVITY) ? "%" : ""));
+            sendPrefs();
         });
 
+        row.addView(slider);
         root.addView(row, matchWidth());
     }
 

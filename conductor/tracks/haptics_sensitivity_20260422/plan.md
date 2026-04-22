@@ -19,10 +19,10 @@
     - [x] Modify the brightness computation (e.g., in `BrightnessCalculator` or `onMove`) to apply the user's chosen sensitivity multiplier.
 - [x] Task: Verify Core Logic (def0ebc)
     - [x] Update unit tests for `BrightnessCalculator` to account for the new sensitivity multiplier.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Haptic Feedback and Sensitivity Logic' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Haptic Feedback and Sensitivity Logic' (Protocol in workflow.md)
 
 ## Phase 3: Final Review and Adjustments
-- [ ] Task: Final Manual Verification
-    - [ ] Test the continuous tick haptic feedback during a swipe on a real device.
-    - [ ] Verify that changing the sensitivity setting immediately affects the gesture distance required to change brightness.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Final Review and Adjustments' (Protocol in workflow.md)
+- [x] Task: Final Manual Verification
+    - [x] Test the continuous tick haptic feedback during a swipe on a real device.
+    - [x] Verify that changing the sensitivity setting immediately affects the gesture distance required to change brightness.
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Final Review and Adjustments' (Protocol in workflow.md)
