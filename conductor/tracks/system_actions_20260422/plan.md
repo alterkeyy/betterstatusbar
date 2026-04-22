@@ -22,12 +22,12 @@
 - [x] Task: Update Unit Tests [7215c94]
     - [ ] Modify `StatusBarActionManagerTest` to verify the parsing and execution logic of the new `system:` actions.
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Implement System Action Logic' (Protocol in workflow.md) [73c545b]
-- [x] Task: Fix Power Saving Toggle [e6214de]
+- [x] Task: Fix Power Saving Toggle [fc437a9]
     - [ ] Update `performSystemAction` to use `Settings.Global.LOW_POWER` as a primary toggle method.
     - [ ] Maintain reflection as a fallback if needed.
 
-## Phase 3: Verification
-- [ ] Task: Final Manual Verification
+## Phase 3: Verification [checkpoint: fc437a9]
+- [x] Task: Final Manual Verification [fc437a9]
     - [ ] Test the new UI flow in the settings app.
     - [ ] Trigger each built-in action via a gesture on a physical/emulated device.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Verification' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Verification' (Protocol in workflow.md) [fc437a9]
