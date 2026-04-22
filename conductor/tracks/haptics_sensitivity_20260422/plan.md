@@ -1,9 +1,9 @@
 # Implementation Plan: Refined Haptics & Sensitivity
 
 ## Phase 1: Configuration UI and Preferences
-- [ ] Task: Update `Prefs.java`
-    - [ ] Add preference keys for `KEY_HAPTIC_INTENSITY` and `KEY_SWIPE_SENSITIVITY`.
-    - [ ] Define sensible default values for both preferences.
+- [x] Task: Update `Prefs.java` (ccb122c)
+    - [x] Add preference keys for `KEY_HAPTIC_INTENSITY` and `KEY_SWIPE_SENSITIVITY`.
+    - [x] Define sensible default values for both preferences.
 - [ ] Task: Update `SettingsActivity.java`
     - [ ] Add UI components (e.g., sliders or dropdowns) for "Haptic Intensity" and "Swipe Sensitivity".
     - [ ] Broadcast these new settings to SystemUI in `sendPrefs()`.
