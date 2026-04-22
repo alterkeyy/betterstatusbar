@@ -34,6 +34,11 @@ public final class Prefs {
     public static final String KEY_STATUSBAR_DOUBLE_TAP_ACTION = "sbbrightness_statusbar_double_tap_action";
     public static final String KEY_STATUSBAR_LONG_TAP_ACTION   = "sbbrightness_statusbar_long_tap_action";
 
+    // ── System Actions ──────────────────────────────────────────────────────
+    public static final String ACTION_SYSTEM_DARK_MODE   = "system:toggle_dark_mode";
+    public static final String ACTION_SYSTEM_POWER_SAVE  = "system:toggle_power_save";
+    public static final String ACTION_SYSTEM_LOCK_SCREEN = "system:lock_screen";
+
     /** Broadcast for live updates — supplements Settings.Secure persistence */
     public static final String ACTION_PREFS_CHANGED  =
             "dev.module.statusbarbrightnessgesture.PREFS_CHANGED";
