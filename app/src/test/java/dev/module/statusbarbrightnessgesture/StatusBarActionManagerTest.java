@@ -17,19 +17,37 @@ public class StatusBarActionManagerTest {
 
     @Test
     public void testParseActionString() {
-        StatusBarActionManager.ParsedIntent pi = StatusBarActionManager.parseAction("intent:android.intent.action.VIEW");
-        assertNotNull(pi);
-        assertEquals("android.intent.action.VIEW", pi.action);
-        assertNull(pi.pkg);
-        assertNull(pi.cls);
+        StatusBarActionManager.ParsedAction pa = StatusBarActionManager.parseAction("intent:android.intent.action.VIEW");
+        assertNotNull(pa);
+        assertEquals("android.intent.action.VIEW", pa.intentAction);
+        assertNull(pa.pkg);
+        assertNull(pa.cls);
+        assertNull(pa.systemAction);
+        assertTrue(pa.isIntent());
+        assertFalse(pa.isSystem());
     }
 
     @Test
     public void testParseActionComponent() {
-        StatusBarActionManager.ParsedIntent pi = StatusBarActionManager.parseAction("intent:com.android.settings/.Settings$BatterySaverSettingsActivity");
-        assertNotNull(pi);
-        assertNull(pi.action);
-        assertEquals("com.android.settings", pi.pkg);
-        assertEquals(".Settings$BatterySaverSettingsActivity", pi.cls);
+        StatusBarActionManager.ParsedAction pa = StatusBarActionManager.parseAction("intent:com.android.settings/.Settings$BatterySaverSettingsActivity");
+        assertNotNull(pa);
+        assertNull(pa.intentAction);
+        assertEquals("com.android.settings", pa.pkg);
+        assertEquals(".Settings$BatterySaverSettingsActivity", pa.cls);
+        assertNull(pa.systemAction);
+        assertTrue(pa.isIntent());
+        assertFalse(pa.isSystem());
+    }
+
+    @Test
+    public void testParseSystemAction() {
+        StatusBarActionManager.ParsedAction pa = StatusBarActionManager.parseAction(Prefs.ACTION_SYSTEM_DARK_MODE);
+        assertNotNull(pa);
+        assertNull(pa.intentAction);
+        assertNull(pa.pkg);
+        assertNull(pa.cls);
+        assertEquals("toggle_dark_mode", pa.systemAction);
+        assertFalse(pa.isIntent());
+        assertTrue(pa.isSystem());
     }
 }

@@ -17,15 +17,25 @@ public class StatusBarActionManager {
         BACKGROUND
     }
 
-    public static class ParsedIntent {
-        public final String action;
+    public static class ParsedAction {
+        public final String intentAction;
         public final String pkg;
         public final String cls;
+        public final String systemAction;
 
-        public ParsedIntent(String action, String pkg, String cls) {
-            this.action = action;
+        public ParsedAction(String intentAction, String pkg, String cls, String systemAction) {
+            this.intentAction = intentAction;
             this.pkg = pkg;
             this.cls = cls;
+            this.systemAction = systemAction;
+        }
+
+        public boolean isSystem() {
+            return systemAction != null;
+        }
+
+        public boolean isIntent() {
+            return intentAction != null || (pkg != null && cls != null);
         }
     }
 
@@ -70,31 +80,43 @@ public class StatusBarActionManager {
         return Area.BACKGROUND;
     }
 
-    public static ParsedIntent parseAction(String action) {
-        if (action == null || !action.startsWith("intent:")) {
+    public static ParsedAction parseAction(String action) {
+        if (action == null) {
             return null;
         }
 
-        String intentStr = action.substring(7);
-        if (intentStr.contains("/")) {
-            String[] parts = intentStr.split("/");
-            return new ParsedIntent(null, parts[0], parts[1]);
-        } else {
-            return new ParsedIntent(intentStr, null, null);
+        if (action.startsWith("intent:")) {
+            String intentStr = action.substring(7);
+            if (intentStr.contains("/")) {
+                String[] parts = intentStr.split("/");
+                return new ParsedAction(null, parts[0], parts[1], null);
+            } else {
+                return new ParsedAction(intentStr, null, null, null);
+            }
+        } else if (action.startsWith("system:")) {
+            return new ParsedAction(null, null, null, action.substring(7));
         }
+
+        return null;
     }
 
     private boolean performAction(Context context, String action) {
         try {
-            ParsedIntent pi = parseAction(action);
-            if (pi == null) return false;
+            ParsedAction pa = parseAction(action);
+            if (pa == null) return false;
+
+            if (pa.isSystem()) {
+                // To be implemented in next task
+                XposedBridge.log(TAG + ": system action not yet implemented: " + pa.systemAction);
+                return false;
+            }
 
             Intent intent;
-            if (pi.pkg != null && pi.cls != null) {
+            if (pa.pkg != null && pa.cls != null) {
                 intent = new Intent();
-                intent.setClassName(pi.pkg, pi.cls);
+                intent.setClassName(pa.pkg, pa.cls);
             } else {
-                intent = new Intent(pi.action);
+                intent = new Intent(pa.intentAction);
             }
             
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
