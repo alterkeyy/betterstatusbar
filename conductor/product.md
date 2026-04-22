@@ -12,7 +12,8 @@ An LSPosed module designed for power users that allows seamless, gesture-based c
 ## Key Features (Current)
 - Horizontal swipe on the status bar to increase/decrease brightness.
 - **Relative Brightness Adjustment (Toggle):** Brightness can be adjusted relative to its current value from any starting position.
-- **Extensible Status Bar Gestures:** Supports configurable single tap, double tap, and long tap gestures on specific icons (Battery, Clock) and empty areas. Each gesture can be assigned to launch a specific Android activity or intent.
+- **Extensible Status Bar Gestures:** Supports configurable single tap, double tap, and long tap gestures on specific icons (Battery, Clock) and empty areas.
+- **Built-in System Actions:** Gestures can be assigned to common system tasks like toggling Dark Mode, toggling Power Saving mode, or instantly Locking the screen, in addition to custom Android intents.
 - **Refined Haptics & Sensitivity:** Continuous tactile feedback during swipes, with user-configurable vibration intensity and gesture sensitivity.
 - Functional with the notification shade open or closed, and on the lockscreen.
 - A dynamic brightness indicator that matches the system's accent color.
