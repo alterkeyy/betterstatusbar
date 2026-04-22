@@ -264,8 +264,12 @@ public class SettingsActivity extends Activity {
 
         row.setOnClickListener(v -> {
             EditText input = new EditText(this);
-            input.setText(mPrefs.getString(prefKey, def));
-            input.setHint("intent:com.package/.ActivityName");
+            String currentVal = mPrefs.getString(prefKey, def);
+            if (currentVal.isEmpty()) {
+                currentVal = "intent:";
+            }
+            input.setText(currentVal);
+            input.setHint("intent:pkg/.Activity");
             
             LinearLayout container = new LinearLayout(this);
             container.setPadding((int)(24*dp), (int)(16*dp), (int)(24*dp), 0);
@@ -273,17 +277,31 @@ public class SettingsActivity extends Activity {
 
             new MaterialAlertDialogBuilder(this)
                 .setTitle("Set Action for " + label)
-                .setMessage("Enter an intent string (e.g., intent:action.NAME or intent:pkg/.Activity)")
+                .setMessage("Enter an intent string in the format:\nintent:pkg/.Activity\nOR\nintent:action.NAME")
                 .setView(container)
                 .setPositiveButton("Save", (dialog, which) -> {
                     String val = input.getText().toString().trim();
+                    
+                    if (val.isEmpty()) {
+                        mPrefs.edit().putString(prefKey, "").apply();
+                        try { Settings.Secure.putString(getContentResolver(), prefKey, ""); } catch (SecurityException ignored) {}
+                        dv.setText("None");
+                        sendPrefs();
+                        return;
+                    }
+
+                    if (!val.startsWith("intent:") || val.length() <= 7) {
+                        Toast.makeText(this, "Invalid format! Must start with 'intent:'", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
                     mPrefs.edit().putString(prefKey, val).apply();
                     try {
                         Settings.Secure.putString(getContentResolver(), prefKey, val);
                     } catch (SecurityException e) {
                         Toast.makeText(this, "Permission missing! Run ADB command.", Toast.LENGTH_LONG).show();
                     }
-                    dv.setText(val.isEmpty() ? "None" : val);
+                    dv.setText(val);
                     sendPrefs();
                 })
                 .setNegativeButton("Cancel", null)
