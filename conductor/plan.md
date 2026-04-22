@@ -1,33 +1,41 @@
-# Implementation Plan: Battery Icon Tap to Settings
+# Implementation Plan: Create GEMINI.md
 
-## Phase 1: Extensible Architecture and Settings UI
-- [ ] Task: Research Status Bar Icon Views
-    - [ ] Identify the class name for the Battery icon view in SystemUI.
-    - [ ] Identify how touch events are dispatched to status bar icons.
-- [ ] Task: Update Settings UI and Preferences
-    - [ ] Add `KEY_BATTERY_TAP_ENABLED` to `Prefs.java`.
-    - [ ] Add a new toggle to `SettingsActivity.java` for "Battery Icon Tap".
-    - [ ] Broadcast the new setting state to SystemUI in `sendPrefs()`.
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Extensible Architecture and Settings UI' (Protocol in workflow.md)
+## Objective
+Create a comprehensive `GEMINI.md` file in the root directory that outlines the project overview, build commands, and development conventions for the Status Bar Brightness Gesture application.
 
-## Phase 2: Tap Handler Implementation
-- [ ] Task: Design Generic Icon Tap Handler Interface
-    - [ ] Define an extensible interface/class for registering status bar icon tap handlers.
-    - [ ] Create a specific implementation for the Battery icon that launches the power usage intent.
-- [ ] Task: Hook Status Bar Icon Touches
-    - [ ] Hook into the appropriate view/controller in SystemUI to intercept clicks on icons.
-    - [ ] Route intercepted clicks through the generic tap handler.
-    - [ ] Ensure the tap handler only triggers if `mBatteryTapEnabled` is true.
-- [ ] Task: Verify Tap Handler with Automated Tests
-    - [ ] Write unit tests for the generic tap handler logic (if isolated from Android framework).
-    - [ ] Verify that the handler correctly identifies the battery icon and fires the intent.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Tap Handler Implementation' (Protocol in workflow.md)
+## Key Files & Context
+- Target file: `/home/alt/projects/kingsrepo/StatusBarBrightnessGesture/GEMINI.md`
+- The project is an Android app with an LSPosed module for brightness control via status bar swipe gestures.
 
-## Phase 3: Integration and Verification
-- [ ] Task: Verify Broadcast Propagation
-    - [ ] Ensure `SettingsActivity` correctly broadcasts the new setting.
-    - [ ] Ensure `BrightnessGestureHook` correctly receives and updates its local state.
-- [ ] Task: Manual Visual Verification
-    - [ ] Install and test on a physical/emulated device.
-    - [ ] Toggle battery tap mode and verify tapping the battery icon opens settings.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Integration and Verification' (Protocol in workflow.md)
+## Implementation Steps
+
+Write the following content to `GEMINI.md`:
+
+```markdown
+# Status Bar Brightness Gesture
+
+## Project Overview
+This repository contains an Android application functioning as an LSPosed module. The module enables users to control screen brightness by swiping horizontally across the status bar. It works on the lockscreen and functions independently of the notification shade's state.
+
+Key features and interactions:
+- Connects to SystemUI via Xposed Framework hooks.
+- Hooks primarily into `PhoneStatusBarView` and `NotificationShadeWindowView`.
+- Interfaces with Android's `DisplayManager` and `WindowManager` via reflection to dynamically adjust device brightness.
+
+## Building and Running
+The project is built using Gradle. Execute the following scripts from the project root:
+
+- **Build Debug APK:** `./gradlew assembleDebug`
+- **Build Release APK:** `./gradlew assembleRelease`
+- **Clean Build Environment:** `./gradlew clean`
+
+## Development Conventions
+- **Language & SDK:** Java 17 source/target compatibility. Minimum SDK 33, Target SDK 35.
+- **Xposed Framework:** Modifies runtime behavior utilizing Xposed APIs. Changes to `app/src/main/assets/xposed_init` are required if the hook entry point class is renamed.
+- **IPC Mechanism:** User preferences configured in the main app's `SettingsActivity` are propagated to the injected SystemUI process via `BroadcastReceiver` to ensure thread-safe, immediate updates without requiring process restarts.
+- **Reflection Use:** Heavy use of Java reflection for invoking hidden Android APIs (e.g., `BrightnessUtils`, `DisplayManager.setTemporaryBrightness`). Ensure robust error handling (`try-catch(Throwable)`) around reflection blocks as OEM ROMs may differ structurally from AOSP.
+```
+
+## Verification & Testing
+- Ensure the newly created `GEMINI.md` file exists in the root directory.
+- Confirm the formatting renders correctly as valid Markdown.
