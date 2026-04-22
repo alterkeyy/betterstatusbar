@@ -10,7 +10,7 @@
     - [ ] Create a helper method to map raw saved strings (like `system:toggle_dark_mode`) to user-friendly labels in the UI.
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Revamp Settings UI' (Protocol in workflow.md)
 
-## Phase 2: Implement System Action Logic
+## Phase 2: Implement System Action Logic [checkpoint: 73c545b]
 - [x] Task: Update `StatusBarActionManager` parsing [b0c559c]
     - [ ] Add support for parsing the `system:` prefix.
     - [ ] Update the `ParsedIntent` or create a new return type to distinguish between standard intents and system actions.
