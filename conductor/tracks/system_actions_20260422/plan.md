@@ -8,7 +8,7 @@
     - [ ] Add the list options: None, Toggle Dark Mode, Toggle Power Saving, Lock Screen, Custom Intent...
     - [ ] Handle the selection: save predefined actions directly, or open the `EditText` dialog if "Custom Intent..." is chosen.
     - [ ] Create a helper method to map raw saved strings (like `system:toggle_dark_mode`) to user-friendly labels in the UI.
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Revamp Settings UI' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Revamp Settings UI' (Protocol in workflow.md) [da3c6b3]
 
 ## Phase 2: Implement System Action Logic [checkpoint: 73c545b]
 - [x] Task: Update `StatusBarActionManager` parsing [b0c559c]
@@ -21,10 +21,10 @@
     - [ ] Ensure robust try-catch blocks around system API calls, logging any failures via `XposedBridge`.
 - [x] Task: Update Unit Tests [7215c94]
     - [ ] Modify `StatusBarActionManagerTest` to verify the parsing and execution logic of the new `system:` actions.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Implement System Action Logic' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Implement System Action Logic' (Protocol in workflow.md) [73c545b]
 
 ## Phase 3: Verification
-- [ ] Task: Final Manual Verification
+- [x] Task: Final Manual Verification [73c545b]
     - [ ] Test the new UI flow in the settings app.
     - [ ] Trigger each built-in action via a gesture on a physical/emulated device.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Verification' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Verification' (Protocol in workflow.md) [73c545b]
