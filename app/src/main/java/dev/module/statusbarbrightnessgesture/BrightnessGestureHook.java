@@ -92,6 +92,7 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
 
     private final StatusBarActionManager mActionManager = new StatusBarActionManager();
     private StatusBarGestureDetector mGestureDetector;
+    private final HapticHandler mHapticHandler = new HapticHandler();
 
     // ── Prefs ─────────────────────────────────────────────────────────────────
 
@@ -99,6 +100,8 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
     private volatile boolean mGestureEnabled = true;
     private volatile boolean mOverlayEnabled  = true;
     private volatile boolean mRelativeEnabled = false;
+    private volatile int mHapticIntensity = Prefs.DEFAULT_HAPTIC_INTENSITY;
+    private volatile int mSwipeSensitivity = Prefs.DEFAULT_SWIPE_SENSITIVITY;
 
     // ── Entry point ───────────────────────────────────────────────────────────
 
@@ -175,6 +178,8 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
                 mGestureEnabled = intent.getBooleanExtra(Prefs.KEY_GESTURE_ENABLED, true);
                 mOverlayEnabled  = intent.getBooleanExtra(Prefs.KEY_OVERLAY_ENABLED,  true);
                 mRelativeEnabled = intent.getBooleanExtra(Prefs.KEY_RELATIVE_BRIGHTNESS, false);
+                mHapticIntensity = intent.getIntExtra(Prefs.KEY_HAPTIC_INTENSITY, Prefs.DEFAULT_HAPTIC_INTENSITY);
+                mSwipeSensitivity = intent.getIntExtra(Prefs.KEY_SWIPE_SENSITIVITY, Prefs.DEFAULT_SWIPE_SENSITIVITY);
 
                 // Update Actions
                 updateActionsFromIntent(intent);
@@ -199,6 +204,10 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
                     Prefs.KEY_OVERLAY_ENABLED, Prefs.DEFAULT_OVERLAY_ENABLED) == 1;
             mRelativeEnabled = Settings.Secure.getInt(context.getContentResolver(),
                     Prefs.KEY_RELATIVE_BRIGHTNESS, Prefs.DEFAULT_RELATIVE_BRIGHTNESS) == 1;
+            mHapticIntensity = Settings.Secure.getInt(context.getContentResolver(),
+                    Prefs.KEY_HAPTIC_INTENSITY, Prefs.DEFAULT_HAPTIC_INTENSITY);
+            mSwipeSensitivity = Settings.Secure.getInt(context.getContentResolver(),
+                    Prefs.KEY_SWIPE_SENSITIVITY, Prefs.DEFAULT_SWIPE_SENSITIVITY);
 
             updateActionsFromSecureSettings(context);
         } catch (Throwable t) {
@@ -491,7 +500,7 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
 
         switch (ev.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:   return onDown(ev, isStatusBarView);
-            case MotionEvent.ACTION_MOVE:   return onMove(ev);
+            case MotionEvent.ACTION_MOVE:   return onMove(ev, view);
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL: return onUpOrCancel(ev);
             default: return false;
@@ -511,7 +520,7 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
         return false;
     }
 
-    private boolean onMove(MotionEvent ev) {
+    private boolean onMove(MotionEvent ev, View view) {
         if (!mTouchStartedInStatusBar) return false;
         if (!mGestureEnabled) return false;
 
@@ -520,7 +529,11 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
         if (!mGestureActive) {
             if (absDX <= mGestureSlopPx || absDX <= absDY * HORIZONTAL_RATIO) return false;
             mGestureActive = true;
+            mHapticHandler.start(mDownX, mScreenWidth, mHapticIntensity);
         }
+
+        mHapticHandler.update(view, ev.getX());
+
         float brightness = computeBrightness(ev.getX());
         setTemporaryBrightness(brightness);
         showIndicator(ev.getX(), brightness);
@@ -547,12 +560,13 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
 
     private float computeBrightness(float fingerX) {
         if (mBrightnessMin < 0) readBrightnessRange();
+        float sensitivity = mSwipeSensitivity / 100f;
         if (mRelativeEnabled) {
             return BrightnessCalculator.computeRelativeBrightness(
-                    mInitialBrightness, mDownX, fingerX, mScreenWidth, mBrightnessMin, mBrightnessMax);
+                    mInitialBrightness, mDownX, fingerX, mScreenWidth, mBrightnessMin, mBrightnessMax, sensitivity);
         } else {
             return BrightnessCalculator.computeAbsoluteBrightness(
-                    fingerX, mScreenWidth, mBrightnessMin, mBrightnessMax);
+                    fingerX, mScreenWidth, mBrightnessMin, mBrightnessMax, sensitivity);
         }
     }
 
