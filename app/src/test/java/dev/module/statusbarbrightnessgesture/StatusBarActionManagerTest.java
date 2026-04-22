@@ -1,9 +1,42 @@
 package dev.module.statusbarbrightnessgesture;
 
+import android.app.UiModeManager;
+import android.content.Context;
+import android.os.PowerManager;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 public class StatusBarActionManagerTest {
+
+    @Mock
+    Context mockContext;
+    @Mock
+    UiModeManager mockUiModeManager;
+    @Mock
+    PowerManager mockPowerManager;
+
+    StatusBarActionManager manager;
+
+    @Before
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
+        manager = new StatusBarActionManager();
+        when(mockContext.getSystemService(Context.UI_MODE_SERVICE)).thenReturn(mockUiModeManager);
+        when(mockContext.getSystemService(Context.POWER_SERVICE)).thenReturn(mockPowerManager);
+    }
+
+    @Test
+    public void testPerformSystemActionDarkMode() {
+        when(mockUiModeManager.getNightMode()).thenReturn(UiModeManager.MODE_NIGHT_NO);
+        boolean result = manager.performSystemAction(mockContext, "toggle_dark_mode");
+        assertTrue(result);
+        verify(mockUiModeManager).setNightMode(UiModeManager.MODE_NIGHT_YES);
+    }
 
     @Test
     public void testParseActionNull() {

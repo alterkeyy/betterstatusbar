@@ -1,7 +1,10 @@
 package dev.module.statusbarbrightnessgesture;
 
+import android.app.UiModeManager;
 import android.content.Context;
 import android.content.Intent;
+import android.os.PowerManager;
+import android.os.SystemClock;
 import android.view.View;
 import java.util.HashMap;
 import java.util.Map;
@@ -106,9 +109,7 @@ public class StatusBarActionManager {
             if (pa == null) return false;
 
             if (pa.isSystem()) {
-                // To be implemented in next task
-                XposedBridge.log(TAG + ": system action not yet implemented: " + pa.systemAction);
-                return false;
+                return performSystemAction(context, pa.systemAction);
             }
 
             Intent intent;
@@ -127,5 +128,44 @@ public class StatusBarActionManager {
             XposedBridge.log(TAG + ": failed to perform action " + action + ": " + t);
             return false;
         }
+    }
+
+    boolean performSystemAction(Context context, String systemAction) {
+        try {
+            if ("toggle_dark_mode".equals(systemAction)) {
+                UiModeManager uiModeManager = (UiModeManager) context.getSystemService(Context.UI_MODE_SERVICE);
+                if (uiModeManager == null) return false;
+                int currentMode = uiModeManager.getNightMode();
+                int newMode = (currentMode == UiModeManager.MODE_NIGHT_YES) ? UiModeManager.MODE_NIGHT_NO : UiModeManager.MODE_NIGHT_YES;
+                uiModeManager.setNightMode(newMode);
+                return true;
+            } else if ("toggle_power_save".equals(systemAction)) {
+                PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+                if (powerManager == null) return false;
+                boolean isEnabled = powerManager.isPowerSaveMode();
+                try {
+                    java.lang.reflect.Method setPowerSaveMode = powerManager.getClass().getMethod("setPowerSaveMode", boolean.class);
+                    setPowerSaveMode.invoke(powerManager, !isEnabled);
+                    return true;
+                } catch (Throwable e) {
+                    XposedBridge.log(TAG + ": reflection failed for setPowerSaveMode: " + e);
+                    return false;
+                }
+            } else if ("lock_screen".equals(systemAction)) {
+                PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+                if (powerManager == null) return false;
+                try {
+                    java.lang.reflect.Method goToSleep = powerManager.getClass().getMethod("goToSleep", long.class);
+                    goToSleep.invoke(powerManager, SystemClock.uptimeMillis());
+                    return true;
+                } catch (Throwable e) {
+                    XposedBridge.log(TAG + ": reflection failed for goToSleep: " + e);
+                    return false;
+                }
+            }
+        } catch (Throwable t) {
+            XposedBridge.log(TAG + ": failed to perform system action " + systemAction + ": " + t);
+        }
+        return false;
     }
 }
