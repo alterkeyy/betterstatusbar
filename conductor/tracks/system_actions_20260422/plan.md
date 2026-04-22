@@ -11,7 +11,7 @@
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Revamp Settings UI' (Protocol in workflow.md)
 
 ## Phase 2: Implement System Action Logic
-- [ ] Task: Update `StatusBarActionManager` parsing
+- [x] Task: Update `StatusBarActionManager` parsing [b0c559c]
     - [ ] Add support for parsing the `system:` prefix.
     - [ ] Update the `ParsedIntent` or create a new return type to distinguish between standard intents and system actions.
 - [ ] Task: Implement `performSystemAction`
