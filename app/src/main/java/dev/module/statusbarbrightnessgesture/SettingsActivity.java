@@ -256,69 +256,97 @@ public class SettingsActivity extends Activity {
         String current = mPrefs.getString(prefKey, def);
         
         TextView dv = new TextView(this);
-        dv.setText(current.isEmpty() ? "None" : current);
+        dv.setText(Prefs.getActionLabel(current));
         dv.setTextSize(13);
         dv.setTextColor(colTextSecondary);
         dv.setPadding(0, (int)(3*dp), 0, 0);
         row.addView(dv);
 
         row.setOnClickListener(v -> {
-            EditText input = new EditText(this);
+            String[] options = {"None", "Toggle Dark Mode", "Toggle Power Saving", "Lock Screen", "Custom Intent..."};
             String currentVal = mPrefs.getString(prefKey, def);
-            if (currentVal.isEmpty()) {
-                currentVal = "intent:";
-            }
-            input.setText(currentVal);
-            input.setHint("intent:pkg/.Activity");
             
-            LinearLayout container = new LinearLayout(this);
-            container.setPadding((int)(24*dp), (int)(16*dp), (int)(24*dp), 0);
-            container.addView(input, matchWidth());
+            int checkedItem = 0; // None
+            if (currentVal.equals(Prefs.ACTION_SYSTEM_DARK_MODE)) checkedItem = 1;
+            else if (currentVal.equals(Prefs.ACTION_SYSTEM_POWER_SAVE)) checkedItem = 2;
+            else if (currentVal.equals(Prefs.ACTION_SYSTEM_LOCK_SCREEN)) checkedItem = 3;
+            else if (!currentVal.isEmpty()) checkedItem = 4; // Custom Intent
 
             new MaterialAlertDialogBuilder(this)
-                .setTitle("Set Action for " + label)
-                .setMessage("Enter an intent string in the format:\nintent:pkg/.Activity\nOR\nintent:action.NAME")
-                .setView(container)
-                .setPositiveButton("Save", (dialog, which) -> {
-                    String val = input.getText().toString().trim();
-                    
-                    if (val.isEmpty()) {
-                        mPrefs.edit().putString(prefKey, "").apply();
-                        try { Settings.Secure.putString(getContentResolver(), prefKey, ""); } catch (SecurityException ignored) {}
-                        dv.setText("None");
-                        sendPrefs();
-                        return;
+                .setTitle("Select Action for " + label)
+                .setSingleChoiceItems(options, checkedItem, (dialog, which) -> {
+                    if (which == 0) { // None
+                        updateAction(prefKey, "", dv);
+                        dialog.dismiss();
+                    } else if (which == 1) { // Dark Mode
+                        updateAction(prefKey, Prefs.ACTION_SYSTEM_DARK_MODE, dv);
+                        dialog.dismiss();
+                    } else if (which == 2) { // Power Save
+                        updateAction(prefKey, Prefs.ACTION_SYSTEM_POWER_SAVE, dv);
+                        dialog.dismiss();
+                    } else if (which == 3) { // Lock Screen
+                        updateAction(prefKey, Prefs.ACTION_SYSTEM_LOCK_SCREEN, dv);
+                        dialog.dismiss();
+                    } else if (which == 4) { // Custom Intent
+                        dialog.dismiss();
+                        showCustomIntentDialog(label, prefKey, def, dp, dv);
                     }
-
-                    if (!val.startsWith("intent:") || val.length() <= 7) {
-                        Toast.makeText(this, "Invalid format! Must start with 'intent:'", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                    mPrefs.edit().putString(prefKey, val).apply();
-                    try {
-                        Settings.Secure.putString(getContentResolver(), prefKey, val);
-                    } catch (SecurityException e) {
-                        Toast.makeText(this, "Permission missing! Run ADB command.", Toast.LENGTH_LONG).show();
-                    }
-                    dv.setText(val);
-                    sendPrefs();
                 })
                 .setNegativeButton("Cancel", null)
-                .setNeutralButton("Clear", (dialog, which) -> {
-                    mPrefs.edit().putString(prefKey, "").apply();
-                    try {
-                        Settings.Secure.putString(getContentResolver(), prefKey, "");
-                    } catch (SecurityException e) {
-                        // ignore
-                    }
-                    dv.setText("None");
-                    sendPrefs();
-                })
                 .show();
         });
 
         root.addView(row, matchWidth());
+    }
+
+    private void updateAction(String prefKey, String value, TextView displayView) {
+        mPrefs.edit().putString(prefKey, value).apply();
+        try {
+            Settings.Secure.putString(getContentResolver(), prefKey, value);
+        } catch (SecurityException e) {
+            Toast.makeText(this, "Permission missing! Run ADB command.", Toast.LENGTH_LONG).show();
+        }
+        displayView.setText(Prefs.getActionLabel(value));
+        sendPrefs();
+    }
+
+    private void showCustomIntentDialog(String label, String prefKey, String def, float dp, TextView dv) {
+        EditText input = new EditText(this);
+        String currentVal = mPrefs.getString(prefKey, def);
+        if (currentVal.isEmpty() || currentVal.startsWith("system:")) {
+            currentVal = "intent:";
+        }
+        input.setText(currentVal);
+        input.setHint("intent:pkg/.Activity");
+        
+        LinearLayout container = new LinearLayout(this);
+        container.setPadding((int)(24*dp), (int)(16*dp), (int)(24*dp), 0);
+        container.addView(input, matchWidth());
+
+        new MaterialAlertDialogBuilder(this)
+            .setTitle("Set Custom Intent for " + label)
+            .setMessage("Enter an intent string in the format:\nintent:pkg/.Activity\nOR\nintent:action.NAME")
+            .setView(container)
+            .setPositiveButton("Save", (dialog, which) -> {
+                String val = input.getText().toString().trim();
+                
+                if (val.isEmpty()) {
+                    updateAction(prefKey, "", dv);
+                    return;
+                }
+
+                if (!val.startsWith("intent:") || val.length() <= 7) {
+                    Toast.makeText(this, "Invalid format! Must start with 'intent:'", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                updateAction(prefKey, val, dv);
+            })
+            .setNegativeButton("Cancel", null)
+            .setNeutralButton("Clear", (dialog, which) -> {
+                updateAction(prefKey, "", dv);
+            })
+            .show();
     }
 
     private Switch buildToggleRow(LinearLayout root, String titleText, String descText,

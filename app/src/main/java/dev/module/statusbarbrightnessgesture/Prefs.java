@@ -55,5 +55,13 @@ public final class Prefs {
     public static final String DEFAULT_ACTION_TIME_TAP = "intent:android.intent.action.SHOW_ALARMS";
     public static final String DEFAULT_ACTION_NONE = "";
 
+    public static String getActionLabel(String action) {
+        if (action == null || action.isEmpty()) return "None";
+        if (action.equals(ACTION_SYSTEM_DARK_MODE)) return "Toggle Dark Mode";
+        if (action.equals(ACTION_SYSTEM_POWER_SAVE)) return "Toggle Power Saving";
+        if (action.equals(ACTION_SYSTEM_LOCK_SCREEN)) return "Lock Screen";
+        return action;
+    }
+
     private Prefs() {}
 }
