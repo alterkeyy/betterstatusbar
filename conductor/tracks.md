@@ -9,5 +9,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [~] **Track: MD3 UI Refactor and Navigation Bar**
+- [x] **Track: MD3 UI Refactor and Navigation Bar**
   *Link: [./tracks/md3_ui_refactor_20260423/](./tracks/md3_ui_refactor_20260423/)*
