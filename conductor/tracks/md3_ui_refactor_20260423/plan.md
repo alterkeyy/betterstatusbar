@@ -27,7 +27,7 @@
     - [ ] Group related preferences into `MaterialCardView` containers.
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Settings Tab Migration' (Protocol in workflow.md) (1c2d0ca)
 
-## Phase 4: Log Tab and File Persistence
+## Phase 4: Log Tab and File Persistence [checkpoint: 36c8cba]
 - [x] Task: Implement File-Based Logging Mechanism (1c2d0ca)
     - [ ] Write unit tests for a new `GestureLogger` class that writes timestamped strings to a local text file.
     - [ ] Implement `GestureLogger` using standard Java/Android File I/O, ensuring thread safety.
@@ -36,4 +36,4 @@
     - [ ] Design the Log tab layout with a scrolling view to display the log file contents.
     - [ ] Add a `MaterialSwitch` to toggle logging on/off.
     - [ ] Implement logic to read the log file and update the UI.
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Log Tab and File Persistence' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Log Tab and File Persistence' (Protocol in workflow.md) (36c8cba)
