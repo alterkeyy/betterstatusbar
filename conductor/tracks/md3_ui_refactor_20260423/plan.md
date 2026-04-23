@@ -11,10 +11,10 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Setup and Navigation Scaffolding' (Protocol in workflow.md) (7353373)
 
 ## Phase 2: Home Tab and Module Status
-- [ ] Task: Implement Module Status Detection (Hook Verification)
+- [x] Task: Implement Module Status Detection (Hook Verification) (7353373)
     - [ ] Write unit tests for a new `ModuleStatusChecker` class (stubbing the expected hooked method).
     - [ ] Implement `ModuleStatusChecker` to detect if the Xposed module is active.
-- [ ] Task: Build Home Tab UI
+- [x] Task: Build Home Tab UI (7353373)
     - [ ] Design the Home tab layout using MD3 Cards to display module status and system info.
     - [ ] Integrate `ModuleStatusChecker` to dynamically update the UI state.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Home Tab and Module Status' (Protocol in workflow.md)

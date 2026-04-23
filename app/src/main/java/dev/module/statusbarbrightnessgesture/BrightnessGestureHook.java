@@ -107,6 +107,11 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
 
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
+        if (lpparam.packageName.equals("dev.module.statusbarbrightnessgesture")) {
+            hookModuleStatus(lpparam);
+            return;
+        }
+
         if (!SYSTEMUI_PACKAGE.equals(lpparam.packageName)) return;
 
         XposedBridge.log(TAG + ": loading in SystemUI");
@@ -123,6 +128,26 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
                 lpparam.classLoader, hookMethodFn, false);
         hookAttachedToWindow(PHONE_STATUS_BAR_VIEW,
                 lpparam.classLoader, hookMethodFn);
+    }
+
+    private void hookModuleStatus(XC_LoadPackage.LoadPackageParam lpparam) {
+        try {
+            Class<?> cls = Class.forName("dev.module.statusbarbrightnessgesture.ModuleStatusChecker", false, lpparam.classLoader);
+            Method target = cls.getDeclaredMethod("isModuleActive");
+            
+            Method hookMethodFn = findHookMethod();
+            if (hookMethodFn == null) return;
+
+            hookMethodFn.invoke(null, target, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) {
+                    param.setResult(true);
+                }
+            });
+            XposedBridge.log(TAG + ": hooked ModuleStatusChecker.isModuleActive in " + lpparam.packageName);
+        } catch (Throwable t) {
+            XposedBridge.log(TAG + ": failed to hook ModuleStatusChecker: " + t);
+        }
     }
 
     private Method findHookMethod() {
