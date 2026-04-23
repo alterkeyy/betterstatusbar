@@ -18,9 +18,9 @@ public class ModuleStatusChecker {
     }
 
     /**
-     * This method is hooked by the Xposed module to return the flavor (e.g. LSPosed, EdXposed).
+     * This method is hooked by the Xposed module to return the framework info (e.g. LSPosed 1.9.3).
      */
-    public static String getModuleFlavor() {
+    public static String getModuleFramework() {
         return "Unknown";
     }
 }

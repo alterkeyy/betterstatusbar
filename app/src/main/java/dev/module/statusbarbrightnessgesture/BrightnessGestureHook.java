@@ -137,7 +137,7 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
             Class<?> cls = Class.forName("dev.module.statusbarbrightnessgesture.ModuleStatusChecker", false, classLoader);
             Method activeTarget = cls.getDeclaredMethod("isModuleActive");
             Method versionTarget = cls.getDeclaredMethod("getModuleApiVersion");
-            Method flavorTarget = cls.getDeclaredMethod("getModuleFlavor");
+            Method flavorTarget = cls.getDeclaredMethod("getModuleFramework");
             
             Method hookMethodFn = findHookMethod();
             if (hookMethodFn == null) return;
@@ -168,8 +168,9 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
                 protected void beforeHookedMethod(MethodHookParam param) {
                     try {
                         Class<?> bridge = classLoader.loadClass("org.lsposed.lsposed.LSPosedBridge");
-                        Method getFlavor = bridge.getDeclaredMethod("getFlavor");
-                        param.setResult(getFlavor.invoke(null));
+                        String flavor = (String) bridge.getDeclaredMethod("getFlavor").invoke(null);
+                        String version = (String) bridge.getDeclaredMethod("getFrameworkVersion").invoke(null);
+                        param.setResult(flavor + " (" + version + ")");
                     } catch (Throwable t) {
                         param.setResult("Xposed/Other");
                     }
