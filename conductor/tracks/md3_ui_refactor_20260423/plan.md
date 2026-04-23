@@ -19,13 +19,13 @@
     - [ ] Integrate `ModuleStatusChecker` to dynamically update the UI state.
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Home Tab and Module Status' (Protocol in workflow.md) (11ddbfa)
 
-## Phase 3: Settings Tab Migration
+## Phase 3: Settings Tab Migration [checkpoint: 1c2d0ca]
 - [x] Task: Migrate Existing Preferences to MD3 (11ddbfa)
     - [ ] Refactor the existing settings UI into the Settings tab.
     - [ ] Replace standard switches with `MaterialSwitch`.
     - [ ] Replace custom sliders/seekbars with `Slider` (Material 3).
     - [ ] Group related preferences into `MaterialCardView` containers.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Settings Tab Migration' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Settings Tab Migration' (Protocol in workflow.md) (1c2d0ca)
 
 ## Phase 4: Log Tab and File Persistence
 - [ ] Task: Implement File-Based Logging Mechanism
