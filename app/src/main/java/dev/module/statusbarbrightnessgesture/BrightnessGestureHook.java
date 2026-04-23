@@ -133,9 +133,11 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
 
     private void hookModuleStatus(XC_LoadPackage.LoadPackageParam lpparam) {
         try {
-            Class<?> cls = Class.forName("dev.module.statusbarbrightnessgesture.ModuleStatusChecker", false, lpparam.classLoader);
+            final ClassLoader classLoader = lpparam.classLoader;
+            Class<?> cls = Class.forName("dev.module.statusbarbrightnessgesture.ModuleStatusChecker", false, classLoader);
             Method activeTarget = cls.getDeclaredMethod("isModuleActive");
             Method versionTarget = cls.getDeclaredMethod("getModuleApiVersion");
+            Method flavorTarget = cls.getDeclaredMethod("getModuleFlavor");
             
             Method hookMethodFn = findHookMethod();
             if (hookMethodFn == null) return;
@@ -151,13 +153,25 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) {
                     try {
-                        Field f = param.thisObject.getClass().getClassLoader()
-                                .loadClass("de.robv.android.xposed.XposedBridge")
+                        Field f = classLoader.loadClass("de.robv.android.xposed.XposedBridge")
                                 .getDeclaredField("XPOSED_VERSION");
                         f.setAccessible(true);
                         param.setResult(f.get(null));
                     } catch (Throwable t) {
                         param.setResult(-1);
+                    }
+                }
+            });
+
+            hookMethodFn.invoke(null, flavorTarget, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) {
+                    try {
+                        Class<?> bridge = classLoader.loadClass("org.lsposed.lsposed.LSPosedBridge");
+                        Method getFlavor = bridge.getDeclaredMethod("getFlavor");
+                        param.setResult(getFlavor.invoke(null));
+                    } catch (Throwable t) {
+                        param.setResult("Xposed/Other");
                     }
                 }
             });

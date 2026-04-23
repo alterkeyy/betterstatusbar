@@ -81,6 +81,10 @@ public class HomeFragment extends Fragment {
         int lsposedApi = ModuleStatusChecker.getModuleApiVersion();
         setInfoRow(view.findViewById(R.id.info_lsposed_api), "LSPosed API", 
                 lsposedApi > 0 ? String.valueOf(lsposedApi) : "Unknown");
+
+        String lsposedFlavor = ModuleStatusChecker.getModuleFlavor();
+        setInfoRow(view.findViewById(R.id.info_lsposed_flavor), "LSPosed Flavor", 
+                lsposedFlavor);
         
         setInfoRow(view.findViewById(R.id.info_device_model), "Device Model", 
                 Build.MANUFACTURER + " " + Build.MODEL + " (" + Build.DEVICE + ")");

@@ -16,4 +16,11 @@ public class ModuleStatusChecker {
     public static int getModuleApiVersion() {
         return -1;
     }
+
+    /**
+     * This method is hooked by the Xposed module to return the flavor (e.g. LSPosed, EdXposed).
+     */
+    public static String getModuleFlavor() {
+        return "Unknown";
+    }
 }
