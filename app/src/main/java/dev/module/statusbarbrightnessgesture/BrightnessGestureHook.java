@@ -134,18 +134,35 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
     private void hookModuleStatus(XC_LoadPackage.LoadPackageParam lpparam) {
         try {
             Class<?> cls = Class.forName("dev.module.statusbarbrightnessgesture.ModuleStatusChecker", false, lpparam.classLoader);
-            Method target = cls.getDeclaredMethod("isModuleActive");
+            Method activeTarget = cls.getDeclaredMethod("isModuleActive");
+            Method versionTarget = cls.getDeclaredMethod("getModuleApiVersion");
             
             Method hookMethodFn = findHookMethod();
             if (hookMethodFn == null) return;
 
-            hookMethodFn.invoke(null, target, new XC_MethodHook() {
+            hookMethodFn.invoke(null, activeTarget, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) {
                     param.setResult(true);
                 }
             });
-            XposedBridge.log(TAG + ": hooked ModuleStatusChecker.isModuleActive in " + lpparam.packageName);
+
+            hookMethodFn.invoke(null, versionTarget, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) {
+                    try {
+                        Field f = param.thisObject.getClass().getClassLoader()
+                                .loadClass("de.robv.android.xposed.XposedBridge")
+                                .getDeclaredField("XPOSED_VERSION");
+                        f.setAccessible(true);
+                        param.setResult(f.get(null));
+                    } catch (Throwable t) {
+                        param.setResult(-1);
+                    }
+                }
+            });
+
+            XposedBridge.log(TAG + ": hooked ModuleStatusChecker methods in " + lpparam.packageName);
         } catch (Throwable t) {
             XposedBridge.log(TAG + ": failed to hook ModuleStatusChecker: " + t);
         }

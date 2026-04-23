@@ -8,4 +8,12 @@ public class ModuleStatusChecker {
     public static boolean isModuleActive() {
         return false;
     }
+
+    /**
+     * This method is hooked by the Xposed module to return the Xposed API version.
+     * Returns -1 if the module is not active.
+     */
+    public static int getModuleApiVersion() {
+        return -1;
+    }
 }
