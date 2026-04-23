@@ -1,12 +1,284 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical">
-    <TextView
-        android:layout_width="wrap_content"
+    android:background="?android:attr/windowBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Settings Fragment"
-        android:textSize="24sp" />
-</LinearLayout>
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Header -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="16dp"
+            android:text="Settings"
+            android:textAppearance="?attr/textAppearanceHeadlineMedium" />
+
+        <!-- Gesture Settings Card -->
+        <com.google.android.material.card.MaterialCardView
+            style="?attr/materialCardViewElevatedStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="24dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:text="Core Gestures"
+                    android:textAppearance="?attr/textAppearanceTitleMedium" />
+
+                <!-- Enable Gesture -->
+                <LinearLayout
+                    android:id="@+id/row_enable_gesture"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingVertical="8dp">
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Enable gesture"
+                            android:textAppearance="?attr/textAppearanceBodyLarge" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Swipe left to dim, right to brighten"
+                            android:textAppearance="?attr/textAppearanceBodySmall"
+                            android:textColor="?android:attr/textColorSecondary" />
+                    </LinearLayout>
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/sw_gesture"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <!-- Show indicator -->
+                <LinearLayout
+                    android:id="@+id/row_show_indicator"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingVertical="8dp">
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Show brightness indicator"
+                            android:textAppearance="?attr/textAppearanceBodyLarge" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Displays brightness % while swiping"
+                            android:textAppearance="?attr/textAppearanceBodySmall"
+                            android:textColor="?android:attr/textColorSecondary" />
+                    </LinearLayout>
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/sw_overlay"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <!-- Relative Adjustment -->
+                <LinearLayout
+                    android:id="@+id/row_relative_adj"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingVertical="8dp">
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Relative adjustment"
+                            android:textAppearance="?attr/textAppearanceBodyLarge" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Adjust relative to current value"
+                            android:textAppearance="?attr/textAppearanceBodySmall"
+                            android:textColor="?android:attr/textColorSecondary" />
+                    </LinearLayout>
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/sw_relative"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Haptics Card -->
+        <com.google.android.material.card.MaterialCardView
+            style="?attr/materialCardViewElevatedStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="24dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:text="Feedback &amp; Sensitivity"
+                    android:textAppearance="?attr/textAppearanceTitleMedium" />
+
+                <!-- Haptic Intensity -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Haptic Intensity"
+                    android:textAppearance="?attr/textAppearanceBodyLarge" />
+                <TextView
+                    android:id="@+id/txt_haptic_val"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tactile feedback strength"
+                    android:textAppearance="?attr/textAppearanceBodySmall"
+                    android:textColor="?android:attr/textColorSecondary" />
+                <com.google.android.material.slider.Slider
+                    android:id="@+id/slider_haptic"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:valueFrom="0"
+                    android:valueTo="3"
+                    android:stepSize="1" />
+
+                <!-- Sensitivity -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Swipe Sensitivity"
+                    android:textAppearance="?attr/textAppearanceBodyLarge" />
+                <TextView
+                    android:id="@+id/txt_sensitivity_val"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Gesture responsiveness"
+                    android:textAppearance="?attr/textAppearanceBodySmall"
+                    android:textColor="?android:attr/textColorSecondary" />
+                <com.google.android.material.slider.Slider
+                    android:id="@+id/slider_sensitivity"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:valueFrom="10"
+                    android:valueTo="500"
+                    android:stepSize="10" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Advanced Gestures Header -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="Advanced Gestures"
+            android:textAppearance="?attr/textAppearanceTitleSmall"
+            android:textColor="?attr/colorPrimary" />
+
+        <!-- Advanced Card -->
+        <com.google.android.material.card.MaterialCardView
+            style="?attr/materialCardViewElevatedStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="24dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- Battery -->
+                <include layout="@layout/row_action" android:id="@+id/row_battery_single" />
+                <include layout="@layout/row_action" android:id="@+id/row_battery_double" />
+                <include layout="@layout/row_action" android:id="@+id/row_battery_long" />
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?attr/colorOutlineVariant" android:layout_marginVertical="8dp" />
+
+                <!-- Time -->
+                <include layout="@layout/row_action" android:id="@+id/row_time_single" />
+                <include layout="@layout/row_action" android:id="@+id/row_time_double" />
+                <include layout="@layout/row_action" android:id="@+id/row_time_long" />
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?attr/colorOutlineVariant" android:layout_marginVertical="8dp" />
+
+                <!-- Status Bar -->
+                <include layout="@layout/row_action" android:id="@+id/row_status_single" />
+                <include layout="@layout/row_action" android:id="@+id/row_status_double" />
+                <include layout="@layout/row_action" android:id="@+id/row_status_long" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Hint Card -->
+        <com.google.android.material.card.MaterialCardView
+            style="?attr/materialCardViewTonalStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="32dp"
+            app:cardCornerRadius="24dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:text="How to use"
+                    android:textAppearance="?attr/textAppearanceTitleMedium" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="• Swipe right on the status bar to increase brightness\n• Swipe left to decrease brightness\n• Works with notification shade open or closed\n• Works on the lockscreen\n• The % indicator matches system brightness\n• Configure tap actions above"
+                    android:textAppearance="?attr/textAppearanceBodySmall"
+                    android:textColor="?android:attr/textColorSecondary"
+                    android:lineSpacingExtra="4dp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
