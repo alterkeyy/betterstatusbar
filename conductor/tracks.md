@@ -8,6 +8,3 @@ This file tracks all major tracks for the project. Each track has its own detail
   *Link: [./tracks/rel_bright_adj_20260422/](./tracks/rel_bright_adj_20260422/)*
 
 ---
-
-- [x] **Track: MD3 UI Refactor and Navigation Bar**
-  *Link: [./tracks/md3_ui_refactor_20260423/](./tracks/md3_ui_refactor_20260423/)*
