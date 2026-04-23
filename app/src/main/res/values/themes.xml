@@ -2,6 +2,6 @@
 <resources>
     <!-- Base theme inheriting Material3 with dynamic colour support -->
     <style name="Theme.StatusBarBrightnessGesture"
-        parent="Theme.Material3.DynamicColors.DayNight">
+        parent="Theme.Material3.DynamicColors.DayNight.NoActionBar">
     </style>
 </resources>
