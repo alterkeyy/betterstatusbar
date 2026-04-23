@@ -160,8 +160,9 @@
 
                 <include layout="@layout/row_info" android:id="@+id/info_build_time" />
                 <include layout="@layout/row_info" android:id="@+id/info_android_version" />
-                <include layout="@layout/row_info" android:id="@+id/info_lsposed_api" />
                 <include layout="@layout/row_info" android:id="@+id/info_lsposed_framework" />
+                <include layout="@layout/row_info" android:id="@+id/info_lsposed_version" />
+                <include layout="@layout/row_info" android:id="@+id/info_lsposed_api" />
                 <include layout="@layout/row_info" android:id="@+id/info_device_model" />
                 <include layout="@layout/row_info" android:id="@+id/info_architecture" />
 

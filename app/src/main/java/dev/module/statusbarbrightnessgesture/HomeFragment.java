@@ -82,13 +82,15 @@ public class HomeFragment extends Fragment {
         setInfoRow(view.findViewById(R.id.info_android_version), "Android Version", 
                 Build.VERSION.RELEASE + " (API " + Build.VERSION.SDK_INT + ")");
 
+        setInfoRow(view.findViewById(R.id.info_lsposed_framework), "LSPosed Framework", 
+                ModuleStatusChecker.getModuleFramework());
+
+        setInfoRow(view.findViewById(R.id.info_lsposed_version), "LSPosed Version", 
+                ModuleStatusChecker.getModuleFrameworkVersion());
+
         int lsposedApi = ModuleStatusChecker.getModuleApiVersion();
         setInfoRow(view.findViewById(R.id.info_lsposed_api), "LSPosed API", 
                 lsposedApi > 0 ? String.valueOf(lsposedApi) : "Unknown");
-
-        String lsposedFramework = ModuleStatusChecker.getModuleFramework();
-        setInfoRow(view.findViewById(R.id.info_lsposed_framework), "LSPosed Framework", 
-                lsposedFramework);
         
         setInfoRow(view.findViewById(R.id.info_device_model), "Device Model", 
                 Build.MANUFACTURER + " " + Build.MODEL + " (" + Build.DEVICE + ")");

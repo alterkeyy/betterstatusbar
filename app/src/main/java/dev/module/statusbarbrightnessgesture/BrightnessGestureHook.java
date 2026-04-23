@@ -129,51 +129,68 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
                 lpparam.classLoader, hookMethodFn, false);
         hookAttachedToWindow(PHONE_STATUS_BAR_VIEW,
                 lpparam.classLoader, hookMethodFn);
-        hookModuleStatus(lpparam);
     }
 
     private void hookModuleStatus(XC_LoadPackage.LoadPackageParam lpparam) {
         try {
-            Class<?> cls = Class.forName("dev.module.statusbarbrightnessgesture.ModuleStatusChecker", false, lpparam.classLoader);
+            final ClassLoader classLoader = lpparam.classLoader;
+            Class<?> cls = Class.forName("dev.module.statusbarbrightnessgesture.ModuleStatusChecker", false, classLoader);
+            Method activeTarget = cls.getDeclaredMethod("isModuleActive");
+            Method versionTarget = cls.getDeclaredMethod("getModuleApiVersion");
+            Method frameworkTarget = cls.getDeclaredMethod("getModuleFramework");
+            Method frameworkVersionTarget = cls.getDeclaredMethod("getModuleFrameworkVersion");
             
-            XposedBridge.hookMethod(cls.getDeclaredMethod("isModuleActive"), new XC_MethodHook() {
+            Method hookMethodFn = findHookMethod();
+            if (hookMethodFn == null) return;
+
+            hookMethodFn.invoke(null, activeTarget, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) {
                     param.setResult(true);
                 }
             });
 
-            XposedBridge.hookMethod(cls.getDeclaredMethod("getModuleApiVersion"), new XC_MethodHook() {
+            hookMethodFn.invoke(null, versionTarget, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) {
                     try {
-                        Field f = XposedBridge.class.getField("XPOSED_VERSION");
+                        Field f = classLoader.loadClass("de.robv.android.xposed.XposedBridge")
+                                .getDeclaredField("XPOSED_VERSION");
+                        f.setAccessible(true);
                         param.setResult(f.get(null));
                     } catch (Throwable t) {
-                        param.setResult(93);
+                        param.setResult(-1);
                     }
                 }
             });
 
-            XposedBridge.hookMethod(cls.getDeclaredMethod("getModuleFramework"), new XC_MethodHook() {
+            hookMethodFn.invoke(null, frameworkTarget, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) {
                     try {
-                        Class<?> lspBridge = lpparam.classLoader.loadClass("org.lsposed.lsposed.LSPosedBridge");
-                        String flavor = (String) lspBridge.getDeclaredMethod("getFlavor").invoke(null);
-                        String version = (String) lspBridge.getDeclaredMethod("getFrameworkVersion").invoke(null);
-                        param.setResult(flavor + " (" + version + ")");
-                    } catch (Throwable t1) {
-                        try {
-                            Class<?> edBridge = lpparam.classLoader.loadClass("com.solomonarnold.xposed.EdXposedBridge");
-                            param.setResult("EdXposed");
-                        } catch (Throwable t2) {
-                            param.setResult("Xposed/Other");
-                        }
+                        Class<?> bridge = classLoader.loadClass("org.lsposed.lsposed.LSPosedBridge");
+                        Method getFlavor = bridge.getDeclaredMethod("getFlavor");
+                        param.setResult(getFlavor.invoke(null));
+                    } catch (Throwable t) {
+                        param.setResult("Xposed/Other");
                     }
                 }
             });
-            XposedBridge.log(TAG + ": hooked ModuleStatusChecker in " + lpparam.packageName);
+
+            hookMethodFn.invoke(null, frameworkVersionTarget, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) {
+                    try {
+                        Class<?> bridge = classLoader.loadClass("org.lsposed.lsposed.LSPosedBridge");
+                        Method getVersion = bridge.getDeclaredMethod("getVersion");
+                        param.setResult(getVersion.invoke(null));
+                    } catch (Throwable t) {
+                        param.setResult("Unknown");
+                    }
+                }
+            });
+
+            XposedBridge.log(TAG + ": hooked ModuleStatusChecker methods in " + lpparam.packageName);
         } catch (Throwable t) {
             XposedBridge.log(TAG + ": failed to hook ModuleStatusChecker: " + t);
         }

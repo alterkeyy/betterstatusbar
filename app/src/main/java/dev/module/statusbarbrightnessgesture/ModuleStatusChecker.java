@@ -18,9 +18,16 @@ public class ModuleStatusChecker {
     }
 
     /**
-     * This method is hooked by the Xposed module to return the framework info (e.g. LSPosed 1.9.3).
+     * This method is hooked by the Xposed module to return the framework name (e.g. LSPosed, EdXposed).
      */
     public static String getModuleFramework() {
+        return "Unknown";
+    }
+
+    /**
+     * This method is hooked by the Xposed module to return the framework version string.
+     */
+    public static String getModuleFrameworkVersion() {
         return "Unknown";
     }
 }
