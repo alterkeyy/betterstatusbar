@@ -42,6 +42,7 @@ public class HomeFragment extends Fragment {
         ImageView statusIcon = view.findViewById(R.id.status_icon);
         TextView statusTitle = view.findViewById(R.id.status_title);
         TextView statusSubtitle = view.findViewById(R.id.status_subtitle);
+        TextView statusRibbon = view.findViewById(R.id.status_ribbon);
 
         boolean active = ModuleStatusChecker.isModuleActive();
         if (active) {
@@ -53,7 +54,10 @@ public class HomeFragment extends Fragment {
             statusIcon.setImageResource(R.drawable.ic_home);
             statusIcon.setColorFilter(requireContext().getColor(android.R.color.holo_red_dark));
         }
-        statusSubtitle.setText("v1.0.3-refactor");
+
+        String buildType = BuildConfig.DEBUG ? "Debug" : "Release";
+        statusSubtitle.setText("v" + BuildConfig.VERSION_NAME + "-" + buildType.toLowerCase());
+        statusRibbon.setText(buildType);
     }
 
     private void setupStats(View view, SharedPreferences prefs) {

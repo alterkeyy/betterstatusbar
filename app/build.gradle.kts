@@ -4,6 +4,9 @@ plugins {
 android {
     namespace = "dev.module.statusbarbrightnessgesture"
     compileSdk = 35
+    buildFeatures {
+        buildConfig = true
+    }
     defaultConfig {
         applicationId = "dev.module.statusbarbrightnessgesture"
         minSdk = 33
