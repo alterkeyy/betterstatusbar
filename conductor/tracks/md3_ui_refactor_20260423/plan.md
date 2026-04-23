@@ -28,11 +28,11 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Settings Tab Migration' (Protocol in workflow.md) (1c2d0ca)
 
 ## Phase 4: Log Tab and File Persistence
-- [ ] Task: Implement File-Based Logging Mechanism
+- [x] Task: Implement File-Based Logging Mechanism (1c2d0ca)
     - [ ] Write unit tests for a new `GestureLogger` class that writes timestamped strings to a local text file.
     - [ ] Implement `GestureLogger` using standard Java/Android File I/O, ensuring thread safety.
     - [ ] Integrate `GestureLogger` into the existing hook logic (e.g., `BrightnessGestureHook`) to record tap events.
-- [ ] Task: Build Log Tab UI
+- [x] Task: Build Log Tab UI (1c2d0ca)
     - [ ] Design the Log tab layout with a scrolling view to display the log file contents.
     - [ ] Add a `MaterialSwitch` to toggle logging on/off.
     - [ ] Implement logic to read the log file and update the UI.

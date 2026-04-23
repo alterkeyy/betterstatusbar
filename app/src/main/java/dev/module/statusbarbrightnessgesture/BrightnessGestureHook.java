@@ -100,6 +100,7 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
     private volatile boolean mGestureEnabled = true;
     private volatile boolean mOverlayEnabled  = true;
     private volatile boolean mRelativeEnabled = false;
+    private volatile boolean mLoggingEnabled  = false;
     private volatile int mHapticIntensity = Prefs.DEFAULT_HAPTIC_INTENSITY;
     private volatile int mSwipeSensitivity = Prefs.DEFAULT_SWIPE_SENSITIVITY;
 
@@ -203,6 +204,7 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
                 mGestureEnabled = intent.getBooleanExtra(Prefs.KEY_GESTURE_ENABLED, true);
                 mOverlayEnabled  = intent.getBooleanExtra(Prefs.KEY_OVERLAY_ENABLED,  true);
                 mRelativeEnabled = intent.getBooleanExtra(Prefs.KEY_RELATIVE_BRIGHTNESS, false);
+                mLoggingEnabled = intent.getBooleanExtra(Prefs.KEY_LOGGING_ENABLED, false);
                 mHapticIntensity = intent.getIntExtra(Prefs.KEY_HAPTIC_INTENSITY, Prefs.DEFAULT_HAPTIC_INTENSITY);
                 mSwipeSensitivity = intent.getIntExtra(Prefs.KEY_SWIPE_SENSITIVITY, Prefs.DEFAULT_SWIPE_SENSITIVITY);
 
@@ -229,6 +231,8 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
                     Prefs.KEY_OVERLAY_ENABLED, Prefs.DEFAULT_OVERLAY_ENABLED) == 1;
             mRelativeEnabled = Settings.Secure.getInt(context.getContentResolver(),
                     Prefs.KEY_RELATIVE_BRIGHTNESS, Prefs.DEFAULT_RELATIVE_BRIGHTNESS) == 1;
+            mLoggingEnabled = Settings.Secure.getInt(context.getContentResolver(),
+                    Prefs.KEY_LOGGING_ENABLED, Prefs.DEFAULT_LOGGING_ENABLED) == 1;
             mHapticIntensity = Settings.Secure.getInt(context.getContentResolver(),
                     Prefs.KEY_HAPTIC_INTENSITY, Prefs.DEFAULT_HAPTIC_INTENSITY);
             mSwipeSensitivity = Settings.Secure.getInt(context.getContentResolver(),
@@ -352,7 +356,11 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
 
             if (mGestureDetector == null) {
                 mGestureDetector = new StatusBarGestureDetector(context, (view, ev, type) -> {
-                    mActionManager.handleGesture(context, findTappedView(view, ev.getX(), ev.getY()), type);
+                    View tapped = findTappedView(view, ev.getX(), ev.getY());
+                    mActionManager.handleGesture(context, tapped, type);
+                    if (mLoggingEnabled) {
+                        sendLog(context, "Gesture: " + type + " on " + tapped.getClass().getSimpleName());
+                    }
                 });
             }
 
@@ -363,6 +371,15 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
         } catch (Throwable t) {
             XposedBridge.log(TAG + ": initDisplayResources failed: " + t);
         }
+    }
+
+    private void sendLog(Context context, String msg) {
+        try {
+            Intent intent = new Intent(Prefs.ACTION_GESTURE_LOG);
+            intent.setPackage("dev.module.statusbarbrightnessgesture");
+            intent.putExtra(Prefs.EXTRA_LOG_MESSAGE, msg);
+            context.sendBroadcast(intent);
+        } catch (Throwable ignored) {}
     }
 
     private View findTappedView(View root, float x, float y) {

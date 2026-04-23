@@ -16,6 +16,7 @@ public final class Prefs {
     public static final String KEY_BATTERY_TAP_ENABLED = "sbbrightness_battery_tap_enabled";
     public static final String KEY_HAPTIC_INTENSITY = "sbbrightness_haptic_intensity";
     public static final String KEY_SWIPE_SENSITIVITY = "sbbrightness_swipe_sensitivity";
+    public static final String KEY_LOGGING_ENABLED = "sbbrightness_logging_enabled";
 
     // ── Gesture Actions ──────────────────────────────────────────────────────
     
@@ -43,12 +44,18 @@ public final class Prefs {
     public static final String ACTION_PREFS_CHANGED  =
             "dev.module.statusbarbrightnessgesture.PREFS_CHANGED";
 
+    /** Broadcast for logging gestures — from hook to companion app */
+    public static final String ACTION_GESTURE_LOG =
+            "dev.module.statusbarbrightnessgesture.GESTURE_LOG";
+    public static final String EXTRA_LOG_MESSAGE = "log_message";
+
     public static final int DEFAULT_GESTURE_ENABLED = 1;
     public static final int DEFAULT_OVERLAY_ENABLED  = 1;
     public static final int DEFAULT_RELATIVE_BRIGHTNESS = 0;
     public static final int DEFAULT_BATTERY_TAP_ENABLED = 0;
     public static final int DEFAULT_HAPTIC_INTENSITY = 1; // 0: None, 1: Subtle, 2: Normal, 3: Strong
     public static final int DEFAULT_SWIPE_SENSITIVITY = 100; // Percentage multiplier
+    public static final int DEFAULT_LOGGING_ENABLED = 0;
 
     // Default actions (empty string means no action)
     public static final String DEFAULT_ACTION_BATTERY_TAP = "intent:android.intent.action.POWER_USAGE_SUMMARY";
