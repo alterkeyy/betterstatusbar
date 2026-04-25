@@ -9,5 +9,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: update LibXposed API 101,use context7**
+- [x] **Track: update LibXposed API 101,use context7**
 *Link: [./tracks/update_libxposed_api_101_20260425/](./tracks/update_libxposed_api_101_20260425/)*

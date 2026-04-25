@@ -3,11 +3,10 @@ package dev.module.statusbarbrightnessgesture;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-
-import de.robv.android.xposed.XposedBridge;
 
 public class StatusBarGestureDetector {
     private static final String TAG = "StatusBarGestureDetector";
@@ -32,6 +31,7 @@ public class StatusBarGestureDetector {
             @Override
             public boolean onSingleTapConfirmed(MotionEvent e) {
                 if (mListener != null && mCurrentView != null) {
+                    Log.d(TAG, "onSingleTapConfirmed");
                     mListener.onGesture(mCurrentView, e, GestureType.SINGLE_TAP);
                     return true;
                 }
@@ -41,6 +41,7 @@ public class StatusBarGestureDetector {
             @Override
             public boolean onDoubleTap(MotionEvent e) {
                 if (mListener != null && mCurrentView != null) {
+                    Log.d(TAG, "onDoubleTap");
                     mListener.onGesture(mCurrentView, e, GestureType.DOUBLE_TAP);
                     return true;
                 }
@@ -50,10 +51,11 @@ public class StatusBarGestureDetector {
             @Override
             public void onLongPress(MotionEvent e) {
                 if (mListener != null && mCurrentView != null) {
+                    Log.d(TAG, "onLongPress");
                     mListener.onGesture(mCurrentView, e, GestureType.LONG_TAP);
                 }
             }
-        }, new Handler(Looper.getMainLooper()));
+        });
     }
 
     public void onTouchEvent(View view, MotionEvent ev) {

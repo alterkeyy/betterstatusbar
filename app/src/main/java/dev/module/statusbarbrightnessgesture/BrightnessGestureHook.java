@@ -11,6 +11,7 @@ import android.graphics.Typeface;
 import android.hardware.display.DisplayManager;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -23,19 +24,32 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.concurrent.Executors;
 
-import de.robv.android.xposed.IXposedHookLoadPackage;
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedBridge;
-import de.robv.android.xposed.callbacks.XC_LoadPackage;
+import androidx.annotation.NonNull;
+
+import io.github.libxposed.api.XposedInterface;
+import io.github.libxposed.api.XposedModule;
+import io.github.libxposed.api.XposedModuleInterface;
 
 /**
  * LSPosed module — status bar brightness gesture.
  */
 @SuppressWarnings({"JavaReflectionMemberAccess", "ConstantConditions"})
-public class BrightnessGestureHook implements IXposedHookLoadPackage {
+public class BrightnessGestureHook extends XposedModule {
 
     private static final String TAG = "BrightnessGestureHook";
     private static final String SYSTEMUI_PACKAGE = "com.android.systemui";
+
+    public BrightnessGestureHook() {
+        super();
+    }
+
+    private void logMsg(String msg) {
+        log(Log.DEBUG, TAG, msg);
+    }
+
+    private void logErr(String msg, Throwable t) {
+        log(Log.ERROR, TAG, msg, t);
+    }
 
     private static final String PHONE_STATUS_BAR_VIEW =
             "com.android.systemui.statusbar.phone.PhoneStatusBarView";
@@ -107,130 +121,80 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
     // ── Entry point ───────────────────────────────────────────────────────────
 
     @Override
-    public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
-        if (lpparam.packageName.equals("dev.module.statusbarbrightnessgesture")) {
-            hookModuleStatus(lpparam);
-            return;
+    public void onModuleLoaded(@NonNull ModuleLoadedParam param) {
+        logMsg(TAG + ": module loaded in process: " + param.getProcessName());
+        
+        // Broadcast status to the app
+        if (SYSTEMUI_PACKAGE.equals(param.getProcessName())) {
+             // We'll wait until we have a context in onPackageLoaded or onAttachedToWindow
+             // Actually, we can't easily send broadcast from onModuleLoaded without a context.
         }
 
-        if (!SYSTEMUI_PACKAGE.equals(lpparam.packageName)) return;
+        if (param.getProcessName().equals("dev.module.statusbarbrightnessgesture")) {
+            try {
+                Method isModuleActive = ModuleStatusChecker.class.getDeclaredMethod("isModuleActive");
+                Method getModuleApiVersion = ModuleStatusChecker.class.getDeclaredMethod("getModuleApiVersion");
+                Method getModuleFramework = ModuleStatusChecker.class.getDeclaredMethod("getModuleFramework");
+                Method getModuleFrameworkVersion = ModuleStatusChecker.class.getDeclaredMethod("getModuleFrameworkVersion");
 
-        XposedBridge.log(TAG + ": loading in SystemUI");
+                deoptimize(isModuleActive);
+                deoptimize(getModuleApiVersion);
+                deoptimize(getModuleFramework);
+                deoptimize(getModuleFrameworkVersion);
 
-        Method hookMethodFn = findHookMethod();
-        if (hookMethodFn == null) {
-            XposedBridge.log(TAG + ": could not find hookMethod() — aborting");
-            return;
-        }
-
-        hookTouchTarget(PHONE_STATUS_BAR_VIEW, "onTouchEvent",
-                lpparam.classLoader, hookMethodFn, true);
-        hookTouchTarget(SHADE_WINDOW_CLASS, "dispatchTouchEvent",
-                lpparam.classLoader, hookMethodFn, false);
-        hookAttachedToWindow(PHONE_STATUS_BAR_VIEW,
-                lpparam.classLoader, hookMethodFn);
-    }
-
-    private void hookModuleStatus(XC_LoadPackage.LoadPackageParam lpparam) {
-        try {
-            final ClassLoader classLoader = lpparam.classLoader;
-            Class<?> cls = Class.forName("dev.module.statusbarbrightnessgesture.ModuleStatusChecker", false, classLoader);
-            Method activeTarget = cls.getDeclaredMethod("isModuleActive");
-            Method versionTarget = cls.getDeclaredMethod("getModuleApiVersion");
-            Method frameworkTarget = cls.getDeclaredMethod("getModuleFramework");
-            Method frameworkVersionTarget = cls.getDeclaredMethod("getModuleFrameworkVersion");
-            
-            Method hookMethodFn = findHookMethod();
-            if (hookMethodFn == null) return;
-
-            hookMethodFn.invoke(null, activeTarget, new XC_MethodHook() {
-                @Override
-                protected void beforeHookedMethod(MethodHookParam param) {
-                    param.setResult(true);
-                }
-            });
-
-            hookMethodFn.invoke(null, versionTarget, new XC_MethodHook() {
-                @Override
-                protected void beforeHookedMethod(MethodHookParam param) {
-                    try {
-                        Field f = classLoader.loadClass("de.robv.android.xposed.XposedBridge")
-                                .getDeclaredField("XPOSED_VERSION");
-                        f.setAccessible(true);
-                        param.setResult(f.get(null));
-                    } catch (Throwable t) {
-                        param.setResult(-1);
-                    }
-                }
-            });
-
-            hookMethodFn.invoke(null, frameworkTarget, new XC_MethodHook() {
-                @Override
-                protected void beforeHookedMethod(MethodHookParam param) {
-                    try {
-                        Class<?> bridge = classLoader.loadClass("org.lsposed.lsposed.LSPosedBridge");
-                        Method getFlavor = bridge.getDeclaredMethod("getFlavor");
-                        param.setResult(getFlavor.invoke(null));
-                    } catch (Throwable t) {
-                        param.setResult("Xposed/Other");
-                    }
-                }
-            });
-
-            hookMethodFn.invoke(null, frameworkVersionTarget, new XC_MethodHook() {
-                @Override
-                protected void beforeHookedMethod(MethodHookParam param) {
-                    try {
-                        Class<?> bridge = classLoader.loadClass("org.lsposed.lsposed.LSPosedBridge");
-                        Method getVersion = bridge.getDeclaredMethod("getVersion");
-                        param.setResult(getVersion.invoke(null));
-                    } catch (Throwable t) {
-                        param.setResult("Unknown");
-                    }
-                }
-            });
-
-            XposedBridge.log(TAG + ": hooked ModuleStatusChecker methods in " + lpparam.packageName);
-        } catch (Throwable t) {
-            XposedBridge.log(TAG + ": failed to hook ModuleStatusChecker: " + t);
-        }
-    }
-
-    private Method findHookMethod() {
-        for (Method m : XposedBridge.class.getDeclaredMethods()) {
-            Class<?>[] params = m.getParameterTypes();
-            if (params.length == 2
-                    && java.lang.reflect.Member.class.isAssignableFrom(params[0])
-                    && XC_MethodHook.class.isAssignableFrom(params[1])) {
-                m.setAccessible(true);
-                return m;
+                hook(isModuleActive).intercept(chain -> true);
+                hook(getModuleApiVersion).intercept(chain -> getApiVersion());
+                hook(getModuleFramework).intercept(chain -> getFrameworkName());
+                hook(getModuleFrameworkVersion).intercept(chain -> getFrameworkVersion());
+                logMsg(TAG + ": self-hooked ModuleStatusChecker with deoptimization");
+            } catch (Throwable t) {
+                logErr(TAG + ": self-hook failed", t);
             }
         }
-        return null;
     }
 
-    private void hookAttachedToWindow(String className, ClassLoader classLoader,
-                                      Method hookMethodFn) {
+    @Override
+    public void onPackageLoaded(@NonNull PackageLoadedParam lp) {
+        logMsg(TAG + ": package loaded: " + lp.getPackageName());
+        if (lp.getPackageName().equals("dev.module.statusbarbrightnessgesture")) {
+            return;
+        }
+
+        if (!SYSTEMUI_PACKAGE.equals(lp.getPackageName())) return;
+
+        logMsg(TAG + ": loading in SystemUI");
+
+        hookTouchTarget(PHONE_STATUS_BAR_VIEW, "onTouchEvent",
+                lp.getDefaultClassLoader(), true);
+        hookTouchTarget(SHADE_WINDOW_CLASS, "dispatchTouchEvent",
+                lp.getDefaultClassLoader(), false);
+        hookAttachedToWindow(PHONE_STATUS_BAR_VIEW,
+                lp.getDefaultClassLoader());
+    }
+
+    private void hookAttachedToWindow(String className, ClassLoader classLoader) {
         try {
             Class<?> cls = Class.forName(className, false, classLoader);
             Method target = cls.getDeclaredMethod("onAttachedToWindow");
-            hookMethodFn.invoke(null, target, new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) {
-                    try {
-                        Context ctx = (Context) param.thisObject.getClass()
-                                .getMethod("getContext").invoke(param.thisObject);
-                        if (ctx == null) return;
+            deoptimize(target);
+            hook(target).intercept(chain -> {
+                Object result = chain.proceed();
+                try {
+                    View thisView = (View) chain.getThisObject();
+                    Context ctx = (Context) thisView.getClass()
+                            .getMethod("getContext").invoke(thisView);
+                    if (ctx != null) {
                         if (!mReceiverRegistered) registerPrefsReceiver(ctx);
                         if (mDisplayManager == null) initDisplayResources(ctx);
-                    } catch (Throwable t) {
-                        XposedBridge.log(TAG + ": onAttachedToWindow init failed: " + t);
                     }
+                } catch (Throwable t) {
+                    logMsg(TAG + ": onAttachedToWindow init failed: " + t);
                 }
+                return result;
             });
-            XposedBridge.log(TAG + ": hooked " + className + ".onAttachedToWindow");
+            logMsg(TAG + ": hooked " + className + ".onAttachedToWindow");
         } catch (Throwable t) {
-            XposedBridge.log(TAG + ": failed to hook onAttachedToWindow: " + t);
+            logMsg(TAG + ": failed to hook onAttachedToWindow: " + t);
         }
     }
 
@@ -239,6 +203,7 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
         mReceiverRegistered = true;
 
         updatePrefsFromContext(context);
+        sendStatusBroadcast(context);
 
         BroadcastReceiver receiver = new BroadcastReceiver() {
             @Override
@@ -256,7 +221,7 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
                 // Update Actions
                 updateActionsFromIntent(intent);
 
-                XposedBridge.log(TAG + ": prefs updated via broadcast");
+                logMsg(TAG + ": prefs updated via broadcast");
                 if (prevGesture && !mGestureEnabled && mIndicatorAttached) {
                     hideIndicator();
                 }
@@ -265,7 +230,7 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
 
         IntentFilter filter = new IntentFilter(Prefs.ACTION_PREFS_CHANGED);
         context.registerReceiver(receiver, filter, Context.RECEIVER_EXPORTED);
-        XposedBridge.log(TAG + ": prefs receiver registered");
+        logMsg(TAG + ": prefs receiver registered");
     }
 
     private void updatePrefsFromContext(Context context) {
@@ -285,7 +250,7 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
 
             updateActionsFromSecureSettings(context);
         } catch (Throwable t) {
-            XposedBridge.log(TAG + ": updatePrefsFromContext failed: " + t);
+            logMsg(TAG + ": updatePrefsFromContext failed: " + t);
         }
     }
 
@@ -329,38 +294,39 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
     }
 
     private void hookTouchTarget(String className, String methodName,
-                                 ClassLoader classLoader, Method hookMethodFn,
+                                 ClassLoader classLoader,
                                  final boolean isStatusBarView) {
         try {
             Class<?> cls = Class.forName(className, false, classLoader);
             Method target = cls.getDeclaredMethod(methodName, MotionEvent.class);
-            hookMethodFn.invoke(null, target, new XC_MethodHook() {
-                @Override
-                protected void beforeHookedMethod(MethodHookParam param) {
-                    MotionEvent ev = (MotionEvent) param.args[0];
-                    if (ev == null) return;
-                    if (mDisplayManager == null) {
-                        try {
-                            Context ctx = (Context) param.thisObject.getClass()
-                                    .getMethod("getContext").invoke(param.thisObject);
-                            if (ctx != null) initDisplayResources(ctx);
-                        } catch (Throwable t) {
-                            XposedBridge.log(TAG + ": display init failed: " + t);
-                        }
-                    }
-
-                    if (handleTouchEvent(ev, isStatusBarView, (View) param.thisObject)) {
-                        param.setResult(true);
+            deoptimize(target);
+            hook(target).intercept(chain -> {
+                MotionEvent ev = (MotionEvent) chain.getArgs().get(0);
+                if (ev == null) return chain.proceed();
+                
+                View thisView = (View) chain.getThisObject();
+                if (mDisplayManager == null) {
+                    try {
+                        Context ctx = (Context) thisView.getClass()
+                                .getMethod("getContext").invoke(thisView);
+                        if (ctx != null) initDisplayResources(ctx);
+                    } catch (Throwable t) {
+                        logMsg(TAG + ": display init failed: " + t);
                     }
                 }
+
+                if (handleTouchEvent(ev, isStatusBarView, thisView)) {
+                    return true;
+                }
+                return chain.proceed();
             });
-            XposedBridge.log(TAG + ": hooked " + className + "." + methodName);
+            logMsg(TAG + ": hooked " + className + "." + methodName);
         } catch (ClassNotFoundException e) {
-            XposedBridge.log(TAG + ": class not found: " + className);
+            logMsg(TAG + ": class not found: " + className);
         } catch (NoSuchMethodException e) {
-            XposedBridge.log(TAG + ": method not found: " + methodName);
+            logMsg(TAG + ": method not found: " + methodName);
         } catch (Throwable t) {
-            XposedBridge.log(TAG + ": hook failed for " + className + ": " + t);
+            logMsg(TAG + ": hook failed for " + className + ": " + t);
         }
     }
 
@@ -394,9 +360,9 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
                         BRIGHTNESS_UTILS_CLASS, false, context.getClassLoader());
                 mConvertLinearToGammaMethod = bu.getMethod(
                         "convertLinearToGammaFloat", float.class, float.class, float.class);
-                XposedBridge.log(TAG + ": found BrightnessUtils.convertLinearToGammaFloat");
+                logMsg(TAG + ": found BrightnessUtils.convertLinearToGammaFloat");
             } catch (Throwable t) {
-                XposedBridge.log(TAG + ": BrightnessUtils not found, using fallback");
+                logMsg(TAG + ": BrightnessUtils not found, using fallback");
             }
 
             if (mGestureDetector == null) {
@@ -412,9 +378,23 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
             readBrightnessRange();
             initIndicator(context);
 
-            XposedBridge.log(TAG + ": display init complete");
+            logMsg(TAG + ": display init complete");
         } catch (Throwable t) {
-            XposedBridge.log(TAG + ": initDisplayResources failed: " + t);
+            logMsg(TAG + ": initDisplayResources failed: " + t);
+        }
+    }
+
+    private void sendStatusBroadcast(Context context) {
+        try {
+            Intent intent = new Intent(Prefs.ACTION_MODULE_STATUS);
+            intent.setPackage("dev.module.statusbarbrightnessgesture");
+            intent.putExtra(Prefs.EXTRA_FRAMEWORK_NAME, getFrameworkName());
+            intent.putExtra(Prefs.EXTRA_FRAMEWORK_VERSION, getFrameworkVersion());
+            intent.putExtra(Prefs.EXTRA_API_VERSION, getApiVersion());
+            context.sendBroadcast(intent);
+            logMsg(TAG + ": status broadcast sent from " + context.getPackageName());
+        } catch (Throwable t) {
+            logErr(TAG + ": failed to send status broadcast", t);
         }
     }
 
@@ -461,7 +441,7 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
         } catch (Throwable t) {
             mBrightnessMin = 0.0f;
             mBrightnessMax = 1.0f;
-            XposedBridge.log(TAG + ": readBrightnessRange fallback: " + t);
+            logMsg(TAG + ": readBrightnessRange fallback: " + t);
         }
     }
 
@@ -498,7 +478,7 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
             mIndicatorParams.gravity = Gravity.TOP | Gravity.START;
             mIndicatorView.setAlpha(0f);
         } catch (Throwable t) {
-            XposedBridge.log(TAG + ": initIndicator failed: " + t);
+            logMsg(TAG + ": initIndicator failed: " + t);
         }
     }
 
@@ -546,7 +526,7 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
             }
             mIndicatorView.setAlpha(1f);
         } catch (Throwable t) {
-            XposedBridge.log(TAG + ": showIndicator failed: " + t);
+            logMsg(TAG + ": showIndicator failed: " + t);
         }
     }
 
@@ -661,7 +641,7 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
         if (mSetTemporaryBrightnessMethod == null) return;
         try { mSetTemporaryBrightnessMethod.invoke(
                 mDisplayManager, Display.DEFAULT_DISPLAY, brightness); }
-        catch (Throwable t) { XposedBridge.log(TAG + ": setTemporaryBrightness: " + t); }
+        catch (Throwable t) { logMsg(TAG + ": setTemporaryBrightness: " + t); }
     }
 
     private void commitBrightness(float brightness) {
@@ -669,7 +649,7 @@ public class BrightnessGestureHook implements IXposedHookLoadPackage {
         mBgExecutor.execute(() -> {
             try { mSetBrightnessMethod.invoke(
                     mDisplayManager, Display.DEFAULT_DISPLAY, brightness); }
-            catch (Throwable t) { XposedBridge.log(TAG + ": setBrightness: " + t); }
+            catch (Throwable t) { logMsg(TAG + ": setBrightness: " + t); }
         });
     }
 

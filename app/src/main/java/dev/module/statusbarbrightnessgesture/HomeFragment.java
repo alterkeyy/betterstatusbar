@@ -22,7 +22,6 @@ import java.util.Locale;
 public class HomeFragment extends Fragment {
 
     private static final String GITHUB_URL = "https://github.com/kingsrepo/StatusBarBrightnessGesture";
-    private static final String TELEGRAM_URL = "https://t.me/example_channel";
 
     @Nullable
     @Override
@@ -42,9 +41,13 @@ public class HomeFragment extends Fragment {
         ImageView statusIcon = view.findViewById(R.id.status_icon);
         TextView statusTitle = view.findViewById(R.id.status_title);
         TextView statusSubtitle = view.findViewById(R.id.status_subtitle);
-        TextView statusRibbon = view.findViewById(R.id.status_ribbon);
 
-        boolean active = ModuleStatusChecker.isModuleActive();
+        SharedPreferences statusPrefs = requireContext().getSharedPreferences(Prefs.LOCAL_PREFS_NAME, Context.MODE_PRIVATE);
+        long lastSeen = statusPrefs.getLong(Prefs.KEY_STATUS_LAST_SEEN, 0);
+        
+        // Consider active if seen in the last 24 hours (usually sent on SystemUI start/hook)
+        boolean active = (System.currentTimeMillis() - lastSeen) < (24 * 60 * 60 * 1000);
+        
         if (active) {
             statusTitle.setText("Activated");
             statusIcon.setImageResource(R.drawable.ic_check_circle);
@@ -57,7 +60,6 @@ public class HomeFragment extends Fragment {
 
         String buildType = BuildConfig.DEBUG ? "Debug" : "Release";
         statusSubtitle.setText("v" + BuildConfig.VERSION_NAME + "-" + buildType.toLowerCase());
-        statusRibbon.setText(buildType);
     }
 
     private void setupStats(View view, SharedPreferences prefs) {
@@ -82,15 +84,16 @@ public class HomeFragment extends Fragment {
         setInfoRow(view.findViewById(R.id.info_android_version), "Android Version", 
                 Build.VERSION.RELEASE + " (API " + Build.VERSION.SDK_INT + ")");
 
-        setInfoRow(view.findViewById(R.id.info_lsposed_framework), "LSPosed Framework", 
-                ModuleStatusChecker.getModuleFramework());
+        SharedPreferences statusPrefs = requireContext().getSharedPreferences(Prefs.LOCAL_PREFS_NAME, Context.MODE_PRIVATE);
+        String framework = statusPrefs.getString(Prefs.KEY_LAST_FRAMEWORK_NAME, "Not Detected");
+        String version = statusPrefs.getString(Prefs.KEY_LAST_FRAMEWORK_VERSION, "");
 
-        setInfoRow(view.findViewById(R.id.info_lsposed_version), "LSPosed Version", 
-                ModuleStatusChecker.getModuleFrameworkVersion());
+        setInfoRow(view.findViewById(R.id.info_lsposed_version), "Framework", 
+                framework + (version.isEmpty() ? "" : " " + version));
 
-        int lsposedApi = ModuleStatusChecker.getModuleApiVersion();
-        setInfoRow(view.findViewById(R.id.info_lsposed_api), "LSPosed API", 
-                lsposedApi > 0 ? String.valueOf(lsposedApi) : "Unknown");
+        int apiVersion = statusPrefs.getInt(Prefs.KEY_LAST_API_VERSION, -1);
+        setInfoRow(view.findViewById(R.id.info_lsposed_api), "LibXposed API", 
+                apiVersion > 0 ? String.valueOf(apiVersion) : "Not Detected");
         
         setInfoRow(view.findViewById(R.id.info_device_model), "Device Model", 
                 Build.MANUFACTURER + " " + Build.MODEL + " (" + Build.DEVICE + ")");
@@ -106,7 +109,6 @@ public class HomeFragment extends Fragment {
 
     private void setupSupportCard(View view) {
         view.findViewById(R.id.btn_github).setOnClickListener(v -> openUrl(GITHUB_URL));
-        view.findViewById(R.id.btn_telegram).setOnClickListener(v -> openUrl(TELEGRAM_URL));
     }
 
     private void openUrl(String url) {

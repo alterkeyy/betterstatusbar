@@ -17,11 +17,6 @@
         android:icon="@mipmap/ic_launcher"
         android:theme="@style/Theme.StatusBarBrightnessGesture">
 
-        <meta-data android:name="xposedmodule" android:value="true" />
-        <meta-data android:name="xposeddescription" android:value="@string/module_description" />
-        <meta-data android:name="xposedminversion" android:value="82" />
-        <meta-data android:name="xposedscope" android:value="com.android.systemui" />
-
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -42,6 +37,7 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="dev.module.statusbarbrightnessgesture.GESTURE_LOG" />
+                <action android:name="dev.module.statusbarbrightnessgesture.MODULE_STATUS" />
             </intent-filter>
         </receiver>
 

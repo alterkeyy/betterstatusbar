@@ -2,12 +2,12 @@
 agp = "9.1.0"
 junit = "4.13.2"
 mockito = "5.11.0"
-# XposedBridge API — 82 is the stable release targeting Android 14/15/16
-xposed-api = "82"
+# LibXposed API — Modern Xposed API
+libxposed-api = "101.0.1"
 
 [libraries]
-# XposedBridge API (compileOnly — provided by LSPosed at runtime)
-xposed-api = { group = "de.robv.android.xposed", name = "api", version.ref = "xposed-api" }
+# LibXposed API (compileOnly — provided by LSPosed at runtime)
+libxposed-api = { group = "io.github.libxposed", name = "api", version.ref = "libxposed-api" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
 

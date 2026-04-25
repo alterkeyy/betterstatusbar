@@ -49,6 +49,20 @@ public final class Prefs {
             "dev.module.statusbarbrightnessgesture.GESTURE_LOG";
     public static final String EXTRA_LOG_MESSAGE = "log_message";
 
+    /** Broadcast for module status updates — from hook to companion app */
+    public static final String ACTION_MODULE_STATUS =
+            "dev.module.statusbarbrightnessgesture.MODULE_STATUS";
+    public static final String EXTRA_FRAMEWORK_NAME = "framework_name";
+    public static final String EXTRA_FRAMEWORK_VERSION = "framework_version";
+    public static final String EXTRA_API_VERSION = "api_version";
+
+    // ── Local SharedPreferences Keys (not Settings.Secure) ───────────────────
+    public static final String LOCAL_PREFS_NAME = "module_status";
+    public static final String KEY_STATUS_LAST_SEEN = "status_last_seen";
+    public static final String KEY_LAST_FRAMEWORK_NAME = "last_framework_name";
+    public static final String KEY_LAST_FRAMEWORK_VERSION = "last_framework_version";
+    public static final String KEY_LAST_API_VERSION = "last_api_version";
+
     public static final int DEFAULT_GESTURE_ENABLED = 1;
     public static final int DEFAULT_OVERLAY_ENABLED  = 1;
     public static final int DEFAULT_RELATIVE_BRIGHTNESS = 0;

@@ -12,9 +12,11 @@
 
 -keep class dev.module.statusbarbrightnessgesture.** { *; }
 
-# Keep all Xposed API classes (they are compileOnly and not in the APK,
-# but keep the references intact so the DEX bytecode is valid).
--keep class de.robv.android.xposed.** { *; }
+# Keep all LibXposed API classes
+-keep class io.github.libxposed.api.** { *; }
+
+-adaptresourcefilenames META-INF/xposed/java_init.list
+-adaptresourcefilenames META-INF/xposed/native_init.list
 
 # BrightnessInfo is accessed via Display.getBrightnessInfo() — keep its fields.
 -keep class android.hardware.display.BrightnessInfo { *; }

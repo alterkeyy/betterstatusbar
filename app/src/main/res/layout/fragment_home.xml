@@ -65,19 +65,6 @@
                         android:textColor="?android:attr/textColorSecondary" />
                 </LinearLayout>
 
-                <!-- Ribbon placeholder -->
-                <TextView
-                    android:id="@+id/status_ribbon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:background="?attr/colorPrimaryContainer"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="4dp"
-                    android:text="Release"
-                    android:textAppearance="?attr/textAppearanceLabelSmall"
-                    android:textColor="?attr/colorOnPrimaryContainer" />
-
             </RelativeLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -160,7 +147,6 @@
 
                 <include layout="@layout/row_info" android:id="@+id/info_build_time" />
                 <include layout="@layout/row_info" android:id="@+id/info_android_version" />
-                <include layout="@layout/row_info" android:id="@+id/info_lsposed_framework" />
                 <include layout="@layout/row_info" android:id="@+id/info_lsposed_version" />
                 <include layout="@layout/row_info" android:id="@+id/info_lsposed_api" />
                 <include layout="@layout/row_info" android:id="@+id/info_device_model" />
@@ -205,12 +191,6 @@
                             android:layout_height="wrap_content"
                             android:text="Feedback on GitHub"
                             android:textAppearance="?attr/textAppearanceBodyMedium" />
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Join our Telegram channel"
-                            android:textAppearance="?attr/textAppearanceBodyMedium"
-                            android:layout_marginTop="4dp" />
                     </LinearLayout>
 
                     <ImageView
@@ -218,16 +198,7 @@
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginEnd="16dp"
                         android:src="@drawable/ic_github"
-                        app:tint="?attr/colorOnSurface" />
-
-                    <ImageView
-                        android:id="@+id/btn_telegram"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_gravity="center_vertical"
-                        android:src="@drawable/ic_telegram"
                         app:tint="?attr/colorOnSurface" />
 
                 </LinearLayout>

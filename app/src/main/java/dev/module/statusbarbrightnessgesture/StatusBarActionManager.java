@@ -5,11 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.PowerManager;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.View;
 import java.util.HashMap;
 import java.util.Map;
-
-import de.robv.android.xposed.XposedBridge;
 
 public class StatusBarActionManager {
     private static final String TAG = "StatusBarActionManager";
@@ -122,10 +121,10 @@ public class StatusBarActionManager {
             
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
-            XposedBridge.log(TAG + ": performed action: " + action);
+            Log.d(TAG, "performed action: " + action);
             return true;
         } catch (Throwable t) {
-            XposedBridge.log(TAG + ": failed to perform action " + action + ": " + t);
+            Log.e(TAG, "failed to perform action " + action, t);
             return false;
         }
     }
@@ -150,7 +149,7 @@ public class StatusBarActionManager {
                     android.provider.Settings.Global.putInt(context.getContentResolver(), "low_power", !isEnabled ? 1 : 0);
                     success = true;
                 } catch (Throwable e) {
-                    XposedBridge.log(TAG + ": Settings.Global failed for low_power: " + e);
+                    Log.e(TAG, "Settings.Global failed for low_power", e);
                 }
 
                 // 2. Try reflection (SystemApi, more direct if supported)
@@ -173,12 +172,12 @@ public class StatusBarActionManager {
                     goToSleep.invoke(powerManager, SystemClock.uptimeMillis());
                     return true;
                 } catch (Throwable e) {
-                    XposedBridge.log(TAG + ": reflection failed for goToSleep: " + e);
+                    Log.e(TAG, "reflection failed for goToSleep", e);
                     return false;
                 }
             }
         } catch (Throwable t) {
-            XposedBridge.log(TAG + ": failed to perform system action " + systemAction + ": " + t);
+            Log.e(TAG, "failed to perform system action " + systemAction, t);
         }
         return false;
     }

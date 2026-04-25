@@ -5,7 +5,7 @@
 
 ## Frameworks & APIs
 - **Android SDK:** The application is built against Target SDK 35, with a Minimum SDK 33.
-- **LSPosed (Xposed Framework):** Used to hook into Android's `SystemUI` (specifically `PhoneStatusBarView` and `NotificationShadeWindowView`) at runtime to capture touch events and manipulate display brightness.
+- **LibXposed (Modern Xposed API 101):** Used to hook into Android's `SystemUI` (specifically `PhoneStatusBarView` and `NotificationShadeWindowView`) at runtime. Targets API 101 for enhanced security and performance, eliminating legacy zygote injection.
 
 ## UI & Presentation
 - **Android Views / Material Components:** Standard Android views and Material Design components are used for the module's companion app and the dynamically injected brightness indicator overlay.

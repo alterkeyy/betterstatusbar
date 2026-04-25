@@ -16,7 +16,7 @@ An LSPosed module designed for power users that allows seamless, gesture-based c
 - **Built-in System Actions:** Gestures can be assigned to common system tasks like toggling Dark Mode, toggling Power Saving mode, or instantly Locking the screen, in addition to custom Android intents.
 - **Refined Haptics & Sensitivity:** Continuous tactile feedback during swipes, with user-configurable vibration intensity and gesture sensitivity.
 - **Tabbed Companion App (MD3):** A modern Material Design 3 interface with Home, Settings, and Log tabs for better organization.
-- **Module Status Detection:** Real-time feedback on whether the LSPosed module is active and hooking correctly.
+- **Modern Module Architecture:** Migrated to LibXposed API 101, ensuring compatibility with LSPosed 2.0 (Vector) and providing robust, real-time feedback on module status.
 - **Persistent Activity Log:** A chronological log of recognized gestures and actions, persisted to a local text file for debugging and verification.
 - Functional with the notification shade open or closed, and on the lockscreen.
 - A dynamic brightness indicator that matches the system's accent color.
