@@ -2,17 +2,17 @@ plugins {
     alias(libs.plugins.android.application)
 }
 android {
-    namespace = "dev.module.statusbarbrightnessgesture"
+    namespace = "dev.module.betterstatusbar"
     compileSdk = 35
     buildFeatures {
         buildConfig = true
     }
     defaultConfig {
-        applicationId = "dev.module.statusbarbrightnessgesture"
+        applicationId = "dev.module.betterstatusbar"
         minSdk = 33
         targetSdk = 35
-        versionCode = 7
-        versionName = "1.6.0"
+        versionCode = 8
+        versionName = "2.0.0"
     }
     buildTypes {
         release {

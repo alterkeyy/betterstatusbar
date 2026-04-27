@@ -1,7 +1,7 @@
-name=Status Bar Brightness Gesture
+name=betterstatusbar
 description=Swipe on status bar to adjust brightness.
-version=1.6.0
-versionCode=7
+version=2.0.0
+versionCode=8
 minApi=101
 targetApiVersion=101
 staticScope=false

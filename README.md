@@ -1,50 +1,73 @@
-# Status Bar Brightness Gesture
+# betterstatusbar
 
 An LSPosed module that lets you swipe horizontally on the status bar to control screen brightness — works with the notification shade open or closed, and on the lockscreen.
 
+## New in v2.0.0 (LibXposed)
+
+- **Migrated to LibXposed (API 101)**: Improved performance and better compatibility with modern LSPosed versions.
+- **Customizable Tap Actions**: Assign single tap, double tap, or long press actions to the battery icon, clock, or empty status bar areas.
+- **System Toggles**: Toggle Dark Mode, Power Saving, or Lock Screen directly from the status bar.
+- **Haptic Feedback**: Subtle vibration feedback when adjusting brightness or triggering actions.
+- **Relative Brightness**: Option to adjust brightness relative to current levels instead of absolute positioning.
+- **Swipe Sensitivity**: Fine-tune the horizontal swipe distance required to change brightness.
+- **Gesture Logging**: Built-in log viewer to debug gesture detection and preference updates.
+
 ## Requirements
 
-- Android 12 or higher
+- **Android 13** or higher (SDK 33+)
 - [Magisk](https://github.com/topjohnwu/Magisk) (rooted device)
-- [LSPosed](https://github.com/LSPosed/LSPosed) (Zygisk edition recommended)
+- [LSPosed v1.9.3+](https://github.com/LSPosed/LSPosed) or other LibXposed-compatible framework
 
 ## Installation
 
 1. Install the APK from the [Releases](../../releases) page
-2. Open LSPosed → Modules → enable **Status Bar Brightness Gesture**
-3. Set the scope to **System UI**
+2. Open LSPosed → Modules → enable **betterstatusbar**
+3. Ensure the scope includes **System UI**
 4. Reboot
 5. Open the app and configure your preferences
 
 ### One-time ADB setup (required for toggle persistence across reboots)
 
 Connect your device via ADB and run:
-```
-adb shell pm grant dev.module.statusbarbrightnessgesture android.permission.WRITE_SECURE_SETTINGS
+```bash
+adb shell pm grant dev.module.betterstatusbar android.permission.WRITE_SECURE_SETTINGS
 ```
 This only needs to be run once after a fresh install. It survives reboots and app updates.
 
 ## Usage
 
-- **Swipe right** on the status bar to increase brightness
-- **Swipe left** on the status bar to decrease brightness
-- Works with the notification shade open or closed
-- Works on the lockscreen
-- The brightness indicator follows your wallpaper accent colour
+- **Swipe Right/Left**: Increase or decrease brightness by sliding horizontally across the status bar.
+- **Tap Actions**: 
+  - **Battery Icon**: Single tap to see battery usage, or customize for other actions.
+  - **Clock**: Single tap to see alarms, or customize for other actions.
+  - **Empty Area**: Double tap to sleep/lock screen (if configured), etc.
+- **Works Everywhere**: Lockscreen, notification shade open, or while using apps.
+- **Indicator**: A non-intrusive percentage overlay follows your swipe, styled with your wallpaper's accent colour.
 
 ## Settings
 
 Open the app to configure:
-- **Enable gesture** — turn the swipe gesture on or off
-- **Show brightness indicator** — show or hide the brightness % overlay while swiping
+- **Gestures**: Enable/disable brightness swipe and tap actions.
+- **Brightness Mode**: Choose between absolute (position-based) or relative (increment-based) adjustment.
+- **Haptics**: Adjust the intensity of vibration feedback (None to Strong).
+- **Sensitivity**: Adjust how far you need to swipe to trigger brightness changes.
+- **Custom Actions**: Map Single Tap, Double Tap, and Long Press for:
+  - Battery Icon
+  - Time/Clock
+  - Status Bar Background
+- **Action Types**:
+  - Launch Intent (System Alarms, Power Usage, etc.)
+  - Toggle Dark Mode
+  - Toggle Power Saving
+  - Lock Screen
 
 ## Compatibility
 
-Works on most AOSP-based Android 12+ ROMs including:
+Works on most AOSP-based Android 13+ ROMs including:
 - Pixel stock (GrapheneOS, CalyxOS)
 - LineageOS and derivatives (crDroid, EvolutionX, DerpFest, etc.)
 
-May not work on heavily customised ROMs such as Samsung OneUI or Xiaomi HyperOS, as these replace the standard status bar classes.
+**Note**: May not work on heavily customized ROMs (Samsung OneUI, Xiaomi HyperOS) as they often replace standard SystemUI status bar classes.
 
 ## Tested on
 
@@ -52,4 +75,4 @@ May not work on heavily customised ROMs such as Samsung OneUI or Xiaomi HyperOS,
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](https://github.com/mbatthew/StatusBarBrightnessGesture/blob/cc585c53bd0278cc5114ed39ca640b52e12d057c/LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/mbatthew/betterstatusbar/blob/cc585c53bd0278cc5114ed39ca640b52e12d057c/LICENSE) file for details.

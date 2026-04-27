@@ -15,7 +15,7 @@
         android:description="@string/app_description"
         android:supportsRtl="true"
         android:icon="@mipmap/ic_launcher"
-        android:theme="@style/Theme.StatusBarBrightnessGesture">
+        android:theme="@style/Theme.betterstatusbar">
 
         <activity
             android:name=".MainActivity"
@@ -36,8 +36,8 @@
             android:name=".LogReceiver"
             android:exported="true">
             <intent-filter>
-                <action android:name="dev.module.statusbarbrightnessgesture.GESTURE_LOG" />
-                <action android:name="dev.module.statusbarbrightnessgesture.MODULE_STATUS" />
+                <action android:name="dev.module.betterstatusbar.GESTURE_LOG" />
+                <action android:name="dev.module.betterstatusbar.MODULE_STATUS" />
             </intent-filter>
         </receiver>
 

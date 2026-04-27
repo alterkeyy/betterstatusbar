@@ -14,3 +14,8 @@ captures/
 # OS
 .DS_Store
 Thumbs.db
+
+# DOC
+detail.md
+conductor/
+AppIcons/

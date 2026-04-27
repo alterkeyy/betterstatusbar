@@ -1,4 +1,4 @@
-package dev.module.statusbarbrightnessgesture;
+package dev.module.betterstatusbar;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -130,7 +130,7 @@ public class BrightnessGestureHook extends XposedModule {
              // Actually, we can't easily send broadcast from onModuleLoaded without a context.
         }
 
-        if (param.getProcessName().equals("dev.module.statusbarbrightnessgesture")) {
+        if (param.getProcessName().equals("dev.module.betterstatusbar")) {
             try {
                 Method isModuleActive = ModuleStatusChecker.class.getDeclaredMethod("isModuleActive");
                 Method getModuleApiVersion = ModuleStatusChecker.class.getDeclaredMethod("getModuleApiVersion");
@@ -156,7 +156,7 @@ public class BrightnessGestureHook extends XposedModule {
     @Override
     public void onPackageLoaded(@NonNull PackageLoadedParam lp) {
         logMsg(TAG + ": package loaded: " + lp.getPackageName());
-        if (lp.getPackageName().equals("dev.module.statusbarbrightnessgesture")) {
+        if (lp.getPackageName().equals("dev.module.betterstatusbar")) {
             return;
         }
 
@@ -387,7 +387,7 @@ public class BrightnessGestureHook extends XposedModule {
     private void sendStatusBroadcast(Context context) {
         try {
             Intent intent = new Intent(Prefs.ACTION_MODULE_STATUS);
-            intent.setPackage("dev.module.statusbarbrightnessgesture");
+            intent.setPackage("dev.module.betterstatusbar");
             intent.putExtra(Prefs.EXTRA_FRAMEWORK_NAME, getFrameworkName());
             intent.putExtra(Prefs.EXTRA_FRAMEWORK_VERSION, getFrameworkVersion());
             intent.putExtra(Prefs.EXTRA_API_VERSION, getApiVersion());
@@ -401,7 +401,7 @@ public class BrightnessGestureHook extends XposedModule {
     private void sendLog(Context context, String msg) {
         try {
             Intent intent = new Intent(Prefs.ACTION_GESTURE_LOG);
-            intent.setPackage("dev.module.statusbarbrightnessgesture");
+            intent.setPackage("dev.module.betterstatusbar");
             intent.putExtra(Prefs.EXTRA_LOG_MESSAGE, msg);
             context.sendBroadcast(intent);
         } catch (Throwable ignored) {}

@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "StatusBarBrightnessGesture"
+rootProject.name = "betterstatusbar"
 include(":app")

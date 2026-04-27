@@ -1,4 +1,4 @@
-package dev.module.statusbarbrightnessgesture;
+package dev.module.betterstatusbar;
 
 import android.app.Activity;
 import android.content.Context;
@@ -29,7 +29,7 @@ import com.google.android.material.slider.Slider;
  * readable by any process including SystemUI, persists across reboots.
  *
  * Requires WRITE_SECURE_SETTINGS — declared in manifest, granted once via ADB:
- *   adb shell pm grant dev.module.statusbarbrightnessgesture android.permission.WRITE_SECURE_SETTINGS
+ *   adb shell pm grant dev.module.betterstatusbar android.permission.WRITE_SECURE_SETTINGS
  */
 @SuppressWarnings("deprecation")
 public class SettingsActivity extends Activity {

@@ -1,4 +1,4 @@
-package dev.module.statusbarbrightnessgesture;
+package dev.module.betterstatusbar;
 
 import android.app.UiModeManager;
 import android.content.Context;

@@ -10,7 +10,7 @@
 # LSPosed finds it via Class.forName() at runtime, so its name
 # must never be obfuscated or removed.
 
--keep class dev.module.statusbarbrightnessgesture.** { *; }
+-keep class dev.module.betterstatusbar.** { *; }
 
 # Keep all LibXposed API classes
 -keep class io.github.libxposed.api.** { *; }

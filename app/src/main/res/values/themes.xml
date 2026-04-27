@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Base theme inheriting Material3 with dynamic colour support -->
-    <style name="Theme.StatusBarBrightnessGesture"
+    <style name="Theme.betterstatusbar"
         parent="Theme.Material3.DynamicColors.DayNight.NoActionBar">
     </style>
 </resources>

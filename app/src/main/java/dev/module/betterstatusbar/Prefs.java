@@ -1,4 +1,4 @@
-package dev.module.statusbarbrightnessgesture;
+package dev.module.betterstatusbar;
 
 public final class Prefs {
     /**
@@ -8,7 +8,7 @@ public final class Prefs {
      * Persists across reboots and app updates (as long as package name unchanged).
      *
      * One-time ADB setup (run after install):
-     *   adb shell pm grant dev.module.statusbarbrightnessgesture android.permission.WRITE_SECURE_SETTINGS
+     *   adb shell pm grant dev.module.betterstatusbar android.permission.WRITE_SECURE_SETTINGS
      */
     public static final String KEY_GESTURE_ENABLED  = "sbbrightness_gesture_enabled";
     public static final String KEY_OVERLAY_ENABLED   = "sbbrightness_overlay_enabled";
@@ -42,16 +42,16 @@ public final class Prefs {
 
     /** Broadcast for live updates — supplements Settings.Secure persistence */
     public static final String ACTION_PREFS_CHANGED  =
-            "dev.module.statusbarbrightnessgesture.PREFS_CHANGED";
+            "dev.module.betterstatusbar.PREFS_CHANGED";
 
     /** Broadcast for logging gestures — from hook to companion app */
     public static final String ACTION_GESTURE_LOG =
-            "dev.module.statusbarbrightnessgesture.GESTURE_LOG";
+            "dev.module.betterstatusbar.GESTURE_LOG";
     public static final String EXTRA_LOG_MESSAGE = "log_message";
 
     /** Broadcast for module status updates — from hook to companion app */
     public static final String ACTION_MODULE_STATUS =
-            "dev.module.statusbarbrightnessgesture.MODULE_STATUS";
+            "dev.module.betterstatusbar.MODULE_STATUS";
     public static final String EXTRA_FRAMEWORK_NAME = "framework_name";
     public static final String EXTRA_FRAMEWORK_VERSION = "framework_version";
     public static final String EXTRA_API_VERSION = "api_version";

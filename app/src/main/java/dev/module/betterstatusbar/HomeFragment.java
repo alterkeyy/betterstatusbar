@@ -1,4 +1,4 @@
-package dev.module.statusbarbrightnessgesture;
+package dev.module.betterstatusbar;
 
 import android.content.Context;
 import android.content.Intent;
@@ -21,7 +21,7 @@ import java.util.Locale;
 
 public class HomeFragment extends Fragment {
 
-    private static final String GITHUB_URL = "https://github.com/kingsrepo/StatusBarBrightnessGesture";
+    private static final String GITHUB_URL = "https://github.com/kingsrepo/betterstatusbar";
 
     @Nullable
     @Override
