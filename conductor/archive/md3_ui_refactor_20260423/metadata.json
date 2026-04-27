@@ -1,8 +1,0 @@
-{
-  "track_id": "md3_ui_refactor_20260423",
-  "type": "feature",
-  "status": "new",
-  "created_at": "2026-04-23T10:00:00Z",
-  "updated_at": "2026-04-23T10:00:00Z",
-  "description": "refactor ui design using md3 expressive style, navigation bar: setting(put most exist ui here ), home(show this lsposed module activity status and system info), log(show every tap behavior with time and toggle)"
-}
