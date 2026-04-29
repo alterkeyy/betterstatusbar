@@ -14,5 +14,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Project configured with complete GitHub CI/CD. Automatically compile x86_64, armv8, and armv7 apk for each push, and perform reasonable, correct and regular version number management.**
+- [~] **Track: Project configured with complete GitHub CI/CD. Automatically compile x86_64, armv8, and armv7 apk for each push, and perform reasonable, correct and regular version number management.**
 *Link: [./tracks/cicd_setup_20260429/](./tracks/cicd_setup_20260429/)*
