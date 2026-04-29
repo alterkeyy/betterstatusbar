@@ -5,9 +5,9 @@ This plan outlines the steps to implement a complete GitHub Actions CI/CD pipeli
 ## Phase 1: Gradle Build Configuration
 This phase focuses on configuring the local Gradle build to support ABI splitting and secure signing via environment variables.
 
-- [ ] Task: Configure ABI Splits in `app/build.gradle.kts`
-    - [ ] Enable `splits.abi` for `x86_64`, `arm64-v8a`, and `armeabi-v7a`
-    - [ ] Set `isUniversalApk = false` to minimize release size
+- [x] Task: Configure ABI Splits in `app/build.gradle.kts` ad5b58e
+    - [x] Enable `splits.abi` for `x86_64`, `arm64-v8a`, and `armeabi-v7a`
+    - [x] Set `isUniversalApk = false` to minimize release size
 - [ ] Task: Secure Signing Configuration
     - [ ] Add signing logic to `app/build.gradle.kts` that reads from environment variables
     - [ ] Use `System.getenv()` for keystore password, alias, etc.
