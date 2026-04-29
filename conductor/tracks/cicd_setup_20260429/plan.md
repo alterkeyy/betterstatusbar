@@ -2,7 +2,7 @@
 
 This plan outlines the steps to implement a complete GitHub Actions CI/CD pipeline with architecture-specific builds and automated versioning.
 
-## Phase 1: Gradle Build Configuration
+## Phase 1: Gradle Build Configuration [checkpoint: 0dc20bf]
 This phase focuses on configuring the local Gradle build to support ABI splitting and secure signing via environment variables.
 
 - [x] Task: Configure ABI Splits in `app/build.gradle.kts` ad5b58e
