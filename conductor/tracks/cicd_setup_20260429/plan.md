@@ -19,11 +19,11 @@ This phase focuses on implementing the automated versioning logic and setting up
 - [x] Task: Implement Automated Versioning 0c9a89e
     - [x] Create a Gradle task or helper to count Git commits using `git rev-list --count HEAD`
     - [x] Update `versionCode` and `versionName` dynamically in the build script
-- [ ] Task: Create GitHub Actions Workflow
-    - [ ] Create `.github/workflows/android.yml`
-    - [ ] Define jobs for building debug/release APKs
-    - [ ] Set up signing steps using secrets
-    - [ ] Add GitHub Release step for tag triggers
+- [x] Task: Create GitHub Actions Workflow c4f63b7
+    - [x] Create `.github/workflows/android.yml`
+    - [x] Define jobs for building debug/release APKs
+    - [x] Set up signing steps using secrets
+    - [x] Add GitHub Release step for tag triggers
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Versioning and CI Workflow' (Protocol in workflow.md)
 
 ## Phase 3: Documentation and Final Verification
