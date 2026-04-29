@@ -16,9 +16,9 @@ This phase focuses on configuring the local Gradle build to support ABI splittin
 ## Phase 2: Versioning and CI Workflow
 This phase focuses on implementing the automated versioning logic and setting up the GitHub Actions workflow.
 
-- [ ] Task: Implement Automated Versioning
-    - [ ] Create a Gradle task or helper to count Git commits using `git rev-list --count HEAD`
-    - [ ] Update `versionCode` and `versionName` dynamically in the build script
+- [x] Task: Implement Automated Versioning 0c9a89e
+    - [x] Create a Gradle task or helper to count Git commits using `git rev-list --count HEAD`
+    - [x] Update `versionCode` and `versionName` dynamically in the build script
 - [ ] Task: Create GitHub Actions Workflow
     - [ ] Create `.github/workflows/android.yml`
     - [ ] Define jobs for building debug/release APKs
