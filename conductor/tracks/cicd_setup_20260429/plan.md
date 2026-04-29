@@ -13,7 +13,7 @@ This phase focuses on configuring the local Gradle build to support ABI splittin
     - [x] Use `System.getenv()` for keystore password, alias, etc.
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Gradle Build Configuration' (Protocol in workflow.md)
 
-## Phase 2: Versioning and CI Workflow
+## Phase 2: Versioning and CI Workflow [checkpoint: 0ef8687]
 This phase focuses on implementing the automated versioning logic and setting up the GitHub Actions workflow.
 
 - [x] Task: Implement Automated Versioning 0c9a89e
