@@ -29,6 +29,6 @@ This phase focuses on implementing the automated versioning logic and setting up
 ## Phase 3: Documentation and Final Verification
 Finalize documentation and ensure the pipeline is ready for the user.
 
-- [ ] Task: Update README with CI/CD Instructions
-    - [ ] Document required GitHub Secrets for the user to set up (Keystore, Passwords)
+- [x] Task: Update README with CI/CD Instructions 2352706
+    - [x] Document required GitHub Secrets for the user to set up (Keystore, Passwords)
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Documentation and Final Verification' (Protocol in workflow.md)
