@@ -8,9 +8,9 @@ This phase focuses on configuring the local Gradle build to support ABI splittin
 - [x] Task: Configure ABI Splits in `app/build.gradle.kts` ad5b58e
     - [x] Enable `splits.abi` for `x86_64`, `arm64-v8a`, and `armeabi-v7a`
     - [x] Set `isUniversalApk = false` to minimize release size
-- [ ] Task: Secure Signing Configuration
-    - [ ] Add signing logic to `app/build.gradle.kts` that reads from environment variables
-    - [ ] Use `System.getenv()` for keystore password, alias, etc.
+- [x] Task: Secure Signing Configuration 50da2b1
+    - [x] Add signing logic to `app/build.gradle.kts` that reads from environment variables
+    - [x] Use `System.getenv()` for keystore password, alias, etc.
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Gradle Build Configuration' (Protocol in workflow.md)
 
 ## Phase 2: Versioning and CI Workflow
