@@ -26,7 +26,7 @@ This phase focuses on implementing the automated versioning logic and setting up
     - [x] Add GitHub Release step for tag triggers
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Versioning and CI Workflow' (Protocol in workflow.md)
 
-## Phase 3: Documentation and Final Verification
+## Phase 3: Documentation and Final Verification [checkpoint: 1acb103]
 Finalize documentation and ensure the pipeline is ready for the user.
 
 - [x] Task: Update README with CI/CD Instructions 2352706
