@@ -14,6 +14,16 @@ android {
         versionCode = 8
         versionName = "2.0.0"
     }
+
+    splits {
+        abi {
+            isEnable = true
+            reset()
+            include("x86_64", "arm64-v8a", "armeabi-v7a")
+            isUniversalApk = false
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
