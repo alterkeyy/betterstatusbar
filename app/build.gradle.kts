@@ -1,18 +1,28 @@
 plugins {
     alias(libs.plugins.android.application)
 }
+
 android {
     namespace = "dev.module.betterstatusbar"
     compileSdk = 35
     buildFeatures {
         buildConfig = true
     }
+    
+    val commitCount = try {
+        val process = Runtime.getRuntime().exec("git rev-list --count HEAD")
+        process.waitFor()
+        process.inputStream.bufferedReader().readText().trim().toInt()
+    } catch (e: Exception) {
+        1
+    }
+
     defaultConfig {
         applicationId = "dev.module.betterstatusbar"
         minSdk = 33
         targetSdk = 35
-        versionCode = 8
-        versionName = "2.0.0"
+        versionCode = commitCount
+        versionName = "2.0.${versionCode}"
     }
 
     signingConfigs {
