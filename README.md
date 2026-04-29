@@ -73,6 +73,25 @@ Works on most AOSP-based Android 13+ ROMs including:
 
 - Pixel 6 (Oriole), DerpFest 16.2, Android 16, LSPosed v1.11.0
 
+## CI/CD Setup
+
+This project uses GitHub Actions for automated building, signing, and releasing architecture-specific APKs.
+
+### Required GitHub Secrets
+
+To enable automated signed releases, configure the following secrets in your GitHub repository (**Settings > Secrets and variables > Actions**):
+
+- `KEYSTORE_BASE64`: Your Android release keystore file, encoded in Base64 (`base64 -w 0 your_keystore.jks`).
+- `KEYSTORE_PASSWORD`: The password for your keystore.
+- `KEY_ALIAS`: The alias for your release key.
+- `KEY_PASSWORD`: The password for your release key.
+
+### Automated Workflows
+
+- **Pull Requests**: Builds the project to ensure code integrity.
+- **Push to Main**: Builds and signs architecture-specific APKs (x86_64, arm64-v8a, armeabi-v7a), uploading them as workflow artifacts.
+- **Tag (v*)**: Automatically creates a GitHub Release and attaches the signed APKs.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/mbatthew/betterstatusbar/blob/cc585c53bd0278cc5114ed39ca640b52e12d057c/LICENSE) file for details.
