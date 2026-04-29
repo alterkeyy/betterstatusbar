@@ -1,0 +1,8 @@
+{
+  "track_id": "cicd_setup_20260429",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-04-29T10:00:00Z",
+  "updated_at": "2026-04-29T10:00:00Z",
+  "description": "Project configured with complete GitHub CI/CD. Automatically compile x86_64, armv8, and armv7 apk for each push, and perform reasonable, correct and regular version number management."
+}
