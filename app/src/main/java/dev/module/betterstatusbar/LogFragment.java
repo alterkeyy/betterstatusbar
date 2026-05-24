@@ -66,7 +66,7 @@ public class LogFragment extends Fragment {
         if (mLogText == null) return;
         String logs = GestureLogger.getLogs(requireContext());
         if (logs.isEmpty()) {
-            mLogText.setText("No logs yet...");
+            mLogText.setText(getString(R.string.log_empty));
         } else {
             mLogText.setText(logs);
             mLogScroll.post(() -> mLogScroll.fullScroll(View.FOCUS_DOWN));

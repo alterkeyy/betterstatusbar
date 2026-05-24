@@ -49,16 +49,16 @@ public class HomeFragment extends Fragment {
         boolean active = (System.currentTimeMillis() - lastSeen) < (24 * 60 * 60 * 1000);
         
         if (active) {
-            statusTitle.setText("Activated");
+            statusTitle.setText(getString(R.string.status_activated));
             statusIcon.setImageResource(R.drawable.ic_check_circle);
             statusIcon.setColorFilter(requireContext().getColor(android.R.color.holo_green_dark));
         } else {
-            statusTitle.setText("Not Activated");
+            statusTitle.setText(getString(R.string.status_not_activated));
             statusIcon.setImageResource(R.drawable.ic_home);
             statusIcon.setColorFilter(requireContext().getColor(android.R.color.holo_red_dark));
         }
 
-        String buildType = BuildConfig.DEBUG ? "Debug" : "Release";
+        String buildType = BuildConfig.DEBUG ? getString(R.string.build_type_debug) : getString(R.string.build_type_release);
         statusSubtitle.setText("v" + BuildConfig.VERSION_NAME + "-" + buildType.toLowerCase());
     }
 
@@ -67,38 +67,38 @@ public class HomeFragment extends Fragment {
         TextView statHaptics = view.findViewById(R.id.stat_haptics);
 
         boolean gesturesEnabled = prefs.getInt(Prefs.KEY_GESTURE_ENABLED, Prefs.DEFAULT_GESTURE_ENABLED) == 1;
-        statGestures.setText(gesturesEnabled ? "Enabled" : "Disabled");
+        statGestures.setText(gesturesEnabled ? getString(R.string.state_enabled) : getString(R.string.state_disabled));
 
         int hapticVal = prefs.getInt(Prefs.KEY_HAPTIC_INTENSITY, Prefs.DEFAULT_HAPTIC_INTENSITY);
-        String hapticLabel = "Normal";
-        if (hapticVal == 0) hapticLabel = "Off";
-        else if (hapticVal == 1) hapticLabel = "Subtle";
-        else if (hapticVal == 3) hapticLabel = "Strong";
-        statHaptics.setText(hapticLabel);
+        int hapticLabelRes = R.string.haptic_normal;
+        if (hapticVal == 0) hapticLabelRes = R.string.haptic_off;
+        else if (hapticVal == 1) hapticLabelRes = R.string.haptic_subtle;
+        else if (hapticVal == 3) hapticLabelRes = R.string.haptic_strong;
+        statHaptics.setText(getString(hapticLabelRes));
     }
 
     private void setupInfoCard(View view) {
-        setInfoRow(view.findViewById(R.id.info_build_time), "Build Time", 
+        setInfoRow(view.findViewById(R.id.info_build_time), getString(R.string.info_build_time), 
                 new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date()));
         
-        setInfoRow(view.findViewById(R.id.info_android_version), "Android Version", 
+        setInfoRow(view.findViewById(R.id.info_android_version), getString(R.string.info_android_version), 
                 Build.VERSION.RELEASE + " (API " + Build.VERSION.SDK_INT + ")");
 
         SharedPreferences statusPrefs = requireContext().getSharedPreferences(Prefs.LOCAL_PREFS_NAME, Context.MODE_PRIVATE);
-        String framework = statusPrefs.getString(Prefs.KEY_LAST_FRAMEWORK_NAME, "Not Detected");
+        String framework = statusPrefs.getString(Prefs.KEY_LAST_FRAMEWORK_NAME, getString(R.string.info_not_detected));
         String version = statusPrefs.getString(Prefs.KEY_LAST_FRAMEWORK_VERSION, "");
 
-        setInfoRow(view.findViewById(R.id.info_lsposed_version), "Framework", 
+        setInfoRow(view.findViewById(R.id.info_lsposed_version), getString(R.string.info_framework), 
                 framework + (version.isEmpty() ? "" : " " + version));
 
         int apiVersion = statusPrefs.getInt(Prefs.KEY_LAST_API_VERSION, -1);
-        setInfoRow(view.findViewById(R.id.info_lsposed_api), "LibXposed API", 
-                apiVersion > 0 ? String.valueOf(apiVersion) : "Not Detected");
+        setInfoRow(view.findViewById(R.id.info_lsposed_api), getString(R.string.info_api_version), 
+                apiVersion > 0 ? String.valueOf(apiVersion) : getString(R.string.info_not_detected));
         
-        setInfoRow(view.findViewById(R.id.info_device_model), "Device Model", 
+        setInfoRow(view.findViewById(R.id.info_device_model), getString(R.string.info_device_model), 
                 Build.MANUFACTURER + " " + Build.MODEL + " (" + Build.DEVICE + ")");
         
-        setInfoRow(view.findViewById(R.id.info_architecture), "System Architecture", 
+        setInfoRow(view.findViewById(R.id.info_architecture), getString(R.string.info_architecture), 
                 String.join(", ", Build.SUPPORTED_ABIS));
     }
 

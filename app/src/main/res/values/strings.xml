@@ -54,6 +54,10 @@
     <string name="statusbar_double_tap">Status Bar Double Tap</string>
     <string name="statusbar_long_tap">Status Bar Long Tap</string>
 
+    <!-- Build Types -->
+    <string name="build_type_debug">Debug</string>
+    <string name="build_type_release">Release</string>
+
     <!-- Status & Stats -->
     <string name="status_activated">Activated</string>
     <string name="status_not_activated">Not Activated</string>

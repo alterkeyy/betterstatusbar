@@ -54,6 +54,10 @@
     <string name="statusbar_double_tap">状态栏双击</string>
     <string name="statusbar_long_tap">状态栏长按</string>
 
+    <!-- Build Types -->
+    <string name="build_type_debug">调试版</string>
+    <string name="build_type_release">发布版</string>
+
     <!-- Status & Stats -->
     <string name="status_activated">已激活</string>
     <string name="status_not_activated">未激活</string>
