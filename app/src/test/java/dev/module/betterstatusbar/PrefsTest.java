@@ -1,7 +1,9 @@
 package dev.module.betterstatusbar;
 
+import android.content.Context;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 public class PrefsTest {
     @Test
@@ -14,11 +16,17 @@ public class PrefsTest {
 
     @Test
     public void testGetActionLabel() {
-        assertEquals("None", Prefs.getActionLabel(""));
-        assertEquals("Toggle Dark Mode", Prefs.getActionLabel(Prefs.ACTION_SYSTEM_DARK_MODE));
-        assertEquals("Toggle Power Saving", Prefs.getActionLabel(Prefs.ACTION_SYSTEM_POWER_SAVE));
-        assertEquals("Lock Screen", Prefs.getActionLabel(Prefs.ACTION_SYSTEM_LOCK_SCREEN));
-        assertEquals("intent:com.android.settings/.Settings", Prefs.getActionLabel("intent:com.android.settings/.Settings"));
+        Context context = mock(Context.class);
+        when(context.getString(R.string.action_none)).thenReturn("None");
+        when(context.getString(R.string.action_dark_mode)).thenReturn("Toggle Dark Mode");
+        when(context.getString(R.string.action_power_save)).thenReturn("Toggle Power Saving");
+        when(context.getString(R.string.action_lock_screen)).thenReturn("Lock Screen");
+
+        assertEquals("None", Prefs.getActionLabel(context, ""));
+        assertEquals("Toggle Dark Mode", Prefs.getActionLabel(context, Prefs.ACTION_SYSTEM_DARK_MODE));
+        assertEquals("Toggle Power Saving", Prefs.getActionLabel(context, Prefs.ACTION_SYSTEM_POWER_SAVE));
+        assertEquals("Lock Screen", Prefs.getActionLabel(context, Prefs.ACTION_SYSTEM_LOCK_SCREEN));
+        assertEquals("intent:com.android.settings/.Settings", Prefs.getActionLabel(context, "intent:com.android.settings/.Settings"));
     }
 
     @Test

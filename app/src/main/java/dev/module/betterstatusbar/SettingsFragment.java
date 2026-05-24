@@ -64,11 +64,11 @@ public class SettingsFragment extends Fragment {
     private void setupSliders(View view) {
         Slider haptic = view.findViewById(R.id.slider_haptic);
         TextView hapticDesc = view.findViewById(R.id.txt_haptic_val);
-        bindSlider(haptic, hapticDesc, "Tactile feedback strength", Prefs.KEY_HAPTIC_INTENSITY, Prefs.DEFAULT_HAPTIC_INTENSITY, "");
+        bindSlider(haptic, hapticDesc, getString(R.string.haptic_intensity_summary), Prefs.KEY_HAPTIC_INTENSITY, Prefs.DEFAULT_HAPTIC_INTENSITY, "");
 
         Slider sensitivity = view.findViewById(R.id.slider_sensitivity);
         TextView sensitivityDesc = view.findViewById(R.id.txt_sensitivity_val);
-        bindSlider(sensitivity, sensitivityDesc, "Gesture responsiveness", Prefs.KEY_SWIPE_SENSITIVITY, Prefs.DEFAULT_SWIPE_SENSITIVITY, "%");
+        bindSlider(sensitivity, sensitivityDesc, getString(R.string.swipe_sensitivity_summary), Prefs.KEY_SWIPE_SENSITIVITY, Prefs.DEFAULT_SWIPE_SENSITIVITY, "%");
     }
 
     private void bindSlider(Slider slider, TextView descView, String descPrefix, String key, int def, String suffix) {
@@ -89,19 +89,19 @@ public class SettingsFragment extends Fragment {
 
     private void setupActionRows(View view) {
         // Battery
-        bindActionRow(view.findViewById(R.id.row_battery_single), "Battery Single Tap", Prefs.KEY_BATTERY_SINGLE_TAP_ACTION, Prefs.DEFAULT_ACTION_BATTERY_TAP);
-        bindActionRow(view.findViewById(R.id.row_battery_double), "Battery Double Tap", Prefs.KEY_BATTERY_DOUBLE_TAP_ACTION, "");
-        bindActionRow(view.findViewById(R.id.row_battery_long),   "Battery Long Tap",   Prefs.KEY_BATTERY_LONG_TAP_ACTION,   "");
+        bindActionRow(view.findViewById(R.id.row_battery_single), getString(R.string.battery_single_tap), Prefs.KEY_BATTERY_SINGLE_TAP_ACTION, Prefs.DEFAULT_ACTION_BATTERY_TAP);
+        bindActionRow(view.findViewById(R.id.row_battery_double), getString(R.string.battery_double_tap), Prefs.KEY_BATTERY_DOUBLE_TAP_ACTION, "");
+        bindActionRow(view.findViewById(R.id.row_battery_long),   getString(R.string.battery_long_tap),   Prefs.KEY_BATTERY_LONG_TAP_ACTION,   "");
 
         // Time
-        bindActionRow(view.findViewById(R.id.row_time_single), "Time Single Tap", Prefs.KEY_TIME_SINGLE_TAP_ACTION, Prefs.DEFAULT_ACTION_TIME_TAP);
-        bindActionRow(view.findViewById(R.id.row_time_double), "Time Double Tap", Prefs.KEY_TIME_DOUBLE_TAP_ACTION, "");
-        bindActionRow(view.findViewById(R.id.row_time_long),   "Time Long Tap",   Prefs.KEY_TIME_LONG_TAP_ACTION,   "");
+        bindActionRow(view.findViewById(R.id.row_time_single), getString(R.string.time_single_tap), Prefs.KEY_TIME_SINGLE_TAP_ACTION, Prefs.DEFAULT_ACTION_TIME_TAP);
+        bindActionRow(view.findViewById(R.id.row_time_double), getString(R.string.time_double_tap), Prefs.KEY_TIME_DOUBLE_TAP_ACTION, "");
+        bindActionRow(view.findViewById(R.id.row_time_long),   getString(R.string.time_long_tap),   Prefs.KEY_TIME_LONG_TAP_ACTION,   "");
 
         // Status Bar
-        bindActionRow(view.findViewById(R.id.row_status_single), "Status Bar Single Tap", Prefs.KEY_STATUSBAR_SINGLE_TAP_ACTION, "");
-        bindActionRow(view.findViewById(R.id.row_status_double), "Status Bar Double Tap", Prefs.KEY_STATUSBAR_DOUBLE_TAP_ACTION, "");
-        bindActionRow(view.findViewById(R.id.row_status_long),   "Status Bar Long Tap",   Prefs.KEY_STATUSBAR_LONG_TAP_ACTION,   "");
+        bindActionRow(view.findViewById(R.id.row_status_single), getString(R.string.statusbar_single_tap), Prefs.KEY_STATUSBAR_SINGLE_TAP_ACTION, "");
+        bindActionRow(view.findViewById(R.id.row_status_double), getString(R.string.statusbar_double_tap), Prefs.KEY_STATUSBAR_DOUBLE_TAP_ACTION, "");
+        bindActionRow(view.findViewById(R.id.row_status_long),   getString(R.string.statusbar_long_tap),   Prefs.KEY_STATUSBAR_LONG_TAP_ACTION,   "");
     }
 
     private void bindActionRow(View row, String label, String key, String def) {
@@ -110,13 +110,19 @@ public class SettingsFragment extends Fragment {
 
         labelView.setText(label);
         String current = mPrefs.getString(key, def);
-        valView.setText(Prefs.getActionLabel(current));
+        valView.setText(Prefs.getActionLabel(requireContext(), current));
 
         row.setOnClickListener(v -> showActionDialog(label, key, def, valView));
     }
 
     private void showActionDialog(String label, String key, String def, TextView valView) {
-        String[] options = {"None", "Toggle Dark Mode", "Toggle Power Saving", "Lock Screen", "Custom Intent..."};
+        String[] options = {
+                getString(R.string.action_none),
+                getString(R.string.action_dark_mode),
+                getString(R.string.action_power_save),
+                getString(R.string.action_lock_screen),
+                getString(R.string.action_custom_intent)
+        };
         String currentVal = mPrefs.getString(key, def);
 
         int checkedItem = 0;
@@ -126,7 +132,7 @@ public class SettingsFragment extends Fragment {
         else if (!currentVal.isEmpty()) checkedItem = 4;
 
         new MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Select Action for " + label)
+                .setTitle(getString(R.string.select_action_title, label))
                 .setSingleChoiceItems(options, checkedItem, (dialog, which) -> {
                     dialog.dismiss();
                     if (which == 0) updateAction(key, "", valView);
@@ -135,7 +141,7 @@ public class SettingsFragment extends Fragment {
                     else if (which == 3) updateAction(key, Prefs.ACTION_SYSTEM_LOCK_SCREEN, valView);
                     else if (which == 4) showCustomIntentDialog(label, key, def, valView);
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(R.string.cancel, null)
                 .show();
     }
 
@@ -153,20 +159,20 @@ public class SettingsFragment extends Fragment {
         container.addView(input, new LinearLayout.LayoutParams(-1, -1));
 
         new MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Set Custom Intent")
-                .setMessage("Format: intent:pkg/.Activity OR intent:action.NAME")
+                .setTitle(R.string.set_custom_intent_title)
+                .setMessage(R.string.set_custom_intent_message)
                 .setView(container)
-                .setPositiveButton("Save", (dialog, which) -> {
+                .setPositiveButton(R.string.save, (dialog, which) -> {
                     String val = input.getText().toString().trim();
                     if (val.isEmpty()) {
                         updateAction(key, "", valView);
                     } else if (!val.startsWith("intent:")) {
-                        Toast.makeText(requireContext(), "Invalid format!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), R.string.invalid_format, Toast.LENGTH_SHORT).show();
                     } else {
                         updateAction(key, val, valView);
                     }
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(R.string.cancel, null)
                 .show();
     }
 
@@ -175,9 +181,9 @@ public class SettingsFragment extends Fragment {
         try {
             Settings.Secure.putString(requireContext().getContentResolver(), key, val);
         } catch (Exception e) {
-            Toast.makeText(requireContext(), "Permission missing!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), R.string.permission_missing, Toast.LENGTH_SHORT).show();
         }
-        valView.setText(Prefs.getActionLabel(val));
+        valView.setText(Prefs.getActionLabel(requireContext(), val));
         sendPrefs();
     }
 

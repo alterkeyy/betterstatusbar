@@ -256,7 +256,7 @@ public class SettingsActivity extends Activity {
         String current = mPrefs.getString(prefKey, def);
         
         TextView dv = new TextView(this);
-        dv.setText(Prefs.getActionLabel(current));
+        dv.setText(Prefs.getActionLabel(this, current));
         dv.setTextSize(13);
         dv.setTextColor(colTextSecondary);
         dv.setPadding(0, (int)(3*dp), 0, 0);
@@ -306,7 +306,7 @@ public class SettingsActivity extends Activity {
         } catch (SecurityException e) {
             Toast.makeText(this, "Permission missing! Run ADB command.", Toast.LENGTH_LONG).show();
         }
-        displayView.setText(Prefs.getActionLabel(value));
+        displayView.setText(Prefs.getActionLabel(this, value));
         sendPrefs();
     }
 

@@ -3,4 +3,83 @@
     <string name="app_name">betterstatusbar</string>
     <string name="app_description">Swipe horizontally on the status bar to adjust screen brightness</string>
     <string name="module_description">Adds a horizontal swipe gesture on the status bar to control screen brightness, mirroring crDroid\'s built-in implementation.</string>
+
+    <!-- Language Selection -->
+    <string name="general_header">General</string>
+    <string name="language_title">Language</string>
+    <string name="language_system_default">System Default</string>
+    <string name="language_chinese">中文 (Chinese)</string>
+    <string name="language_english">English</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="core_gestures_title">Core Gestures</string>
+    <string name="enable_gesture_title">Enable gesture</string>
+    <string name="enable_gesture_summary">Swipe left to dim, right to brighten</string>
+    <string name="show_indicator_title">Show brightness indicator</string>
+    <string name="show_indicator_summary">Displays brightness % while swiping</string>
+    <string name="relative_adjustment_title">Relative adjustment</string>
+    <string name="relative_adjustment_summary">Adjust relative to current value</string>
+    <string name="feedback_sensitivity_title">Feedback &amp; Sensitivity</string>
+    <string name="haptic_intensity_title">Haptic Intensity</string>
+    <string name="haptic_intensity_summary">Tactile feedback strength</string>
+    <string name="swipe_sensitivity_title">Swipe Sensitivity</string>
+    <string name="swipe_sensitivity_summary">Gesture responsiveness</string>
+    <string name="advanced_gestures_title">Advanced Gestures</string>
+    <string name="how_to_use_title">How to use</string>
+    <string name="how_to_use_content">• Swipe right on the status bar to increase brightness\n• Swipe left to decrease brightness\n• Works with notification shade open or closed\n• Works on the lockscreen\n• The % indicator matches system brightness\n• Configure tap actions above</string>
+
+    <!-- Actions -->
+    <string name="action_none">None</string>
+    <string name="action_dark_mode">Toggle Dark Mode</string>
+    <string name="action_power_save">Toggle Power Saving</string>
+    <string name="action_lock_screen">Lock Screen</string>
+    <string name="action_custom_intent">Custom Intent...</string>
+    <string name="select_action_title">Select Action for %s</string>
+    <string name="set_custom_intent_title">Set Custom Intent</string>
+    <string name="set_custom_intent_message">Format: intent:pkg/.Activity OR intent:action.NAME</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="invalid_format">Invalid format!</string>
+    <string name="permission_missing">Permission missing!</string>
+
+    <!-- Action Labels -->
+    <string name="battery_single_tap">Battery Single Tap</string>
+    <string name="battery_double_tap">Battery Double Tap</string>
+    <string name="battery_long_tap">Battery Long Tap</string>
+    <string name="time_single_tap">Time Single Tap</string>
+    <string name="time_double_tap">Time Double Tap</string>
+    <string name="time_long_tap">Time Long Tap</string>
+    <string name="statusbar_single_tap">Status Bar Single Tap</string>
+    <string name="statusbar_double_tap">Status Bar Double Tap</string>
+    <string name="statusbar_long_tap">Status Bar Long Tap</string>
+
+    <!-- Home -->
+    <string name="status_activated">Activated</string>
+    <string name="status_not_activated">Not Activated</string>
+    <string name="gestures_title">Gestures</string>
+    <string name="haptics_title">Haptics</string>
+    <string name="enabled">Enabled</string>
+    <string name="disabled">Disabled</string>
+    <string name="haptic_off">Off</string>
+    <string name="haptic_subtle">Subtle</string>
+    <string name="haptic_normal">Normal</string>
+    <string name="haptic_strong">Strong</string>
+    <string name="issues_title">Encountered issues?</string>
+    <string name="feedback_github">Feedback on GitHub</string>
+    <string name="not_detected">Not Detected</string>
+    <string name="info_build_time">Build Time</string>
+    <string name="info_android_version">Android Version</string>
+    <string name="info_framework">Framework</string>
+    <string name="info_libxposed_api">LibXposed API</string>
+    <string name="info_device_model">Device Model</string>
+    <string name="info_system_architecture">System Architecture</string>
+
+    <!-- Logs -->
+    <string name="log_title">Activity Log</string>
+    <string name="enable_logging_title">Enable Logging</string>
+    <string name="enable_logging_summary">Record gesture events to a file</string>
+    <string name="recent_events_title">Recent Events</string>
+    <string name="clear">Clear</string>
+    <string name="no_logs">No logs yet...</string>
 </resources>

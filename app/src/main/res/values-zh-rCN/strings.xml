@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">betterstatusbar</string>
+    <string name="app_description">在状态栏水平滑动调节屏幕亮度</string>
+    <string name="module_description">在状态栏增加水平滑动动作以控制屏幕亮度，镜像自 crDroid 的内置实现。</string>
+
+    <!-- Language Selection -->
+    <string name="general_header">常规</string>
+    <string name="language_title">语言</string>
+    <string name="language_system_default">系统默认</string>
+    <string name="language_chinese">中文</string>
+    <string name="language_english">英文</string>
+
+    <!-- Settings -->
+    <string name="settings_title">设置</string>
+    <string name="core_gestures_title">核心手势</string>
+    <string name="enable_gesture_title">启用手势</string>
+    <string name="enable_gesture_summary">向左滑动调暗，向右滑动调亮</string>
+    <string name="show_indicator_title">显示亮度指示器</string>
+    <string name="show_indicator_summary">滑动时显示亮度百分比</string>
+    <string name="relative_adjustment_title">相对调节</string>
+    <string name="relative_adjustment_summary">相对于当前值进行调节</string>
+    <string name="feedback_sensitivity_title">反馈与灵敏度</string>
+    <string name="haptic_intensity_title">触感强度</string>
+    <string name="haptic_intensity_summary">触感反馈强度</string>
+    <string name="swipe_sensitivity_title">滑动灵敏度</string>
+    <string name="swipe_sensitivity_summary">手势响应灵敏度</string>
+    <string name="advanced_gestures_title">高级手势</string>
+    <string name="how_to_use_title">如何使用</string>
+    <string name="how_to_use_content">• 在状态栏向右滑动增加亮度\n• 在状态栏向左滑动降低亮度\n• 支持通知栏展开或收起状态\n• 支持在锁屏界面使用\n• 百分比指示器与系统亮度一致\n• 在上方配置点击动作</string>
+
+    <!-- Actions -->
+    <string name="action_none">无</string>
+    <string name="action_dark_mode">切换深色模式</string>
+    <string name="action_power_save">切换省电模式</string>
+    <string name="action_lock_screen">锁定屏幕</string>
+    <string name="action_custom_intent">自定义 Intent...</string>
+    <string name="select_action_title">选择 %s 的动作</string>
+    <string name="set_custom_intent_title">设置自定义 Intent</string>
+    <string name="set_custom_intent_message">格式: intent:pkg/.Activity 或 intent:action.NAME</string>
+    <string name="save">保存</string>
+    <string name="cancel">取消</string>
+    <string name="invalid_format">格式无效！</string>
+    <string name="permission_missing">缺少权限！</string>
+
+    <!-- Action Labels -->
+    <string name="battery_single_tap">电池图标单击</string>
+    <string name="battery_double_tap">电池图标双击</string>
+    <string name="battery_long_tap">电池图标长按</string>
+    <string name="time_single_tap">时间图标单击</string>
+    <string name="time_double_tap">时间图标双击</string>
+    <string name="time_long_tap">时间图标长按</string>
+    <string name="statusbar_single_tap">状态栏单击</string>
+    <string name="statusbar_double_tap">状态栏双击</string>
+    <string name="statusbar_long_tap">状态栏长按</string>
+
+    <!-- Home -->
+    <string name="status_activated">已激活</string>
+    <string name="status_not_activated">未激活</string>
+    <string name="gestures_title">手势</string>
+    <string name="haptics_title">触感</string>
+    <string name="enabled">已启用</string>
+    <string name="disabled">已禁用</string>
+    <string name="haptic_off">关闭</string>
+    <string name="haptic_subtle">微弱</string>
+    <string name="haptic_normal">普通</string>
+    <string name="haptic_strong">强烈</string>
+    <string name="issues_title">遇到问题？</string>
+    <string name="feedback_github">在 GitHub 上反馈</string>
+    <string name="not_detected">未检测到</string>
+    <string name="info_build_time">构建时间</string>
+    <string name="info_android_version">Android 版本</string>
+    <string name="info_framework">框架</string>
+    <string name="info_libxposed_api">LibXposed API</string>
+    <string name="info_device_model">设备型号</string>
+    <string name="info_system_architecture">系统架构</string>
+
+    <!-- Logs -->
+    <string name="log_title">活动日志</string>
+    <string name="enable_logging_title">启用日志</string>
+    <string name="enable_logging_summary">记录手势事件到文件</string>
+    <string name="recent_events_title">最近事件</string>
+    <string name="clear">清除</string>
+    <string name="no_logs">暂无日志...</string>
+</resources>

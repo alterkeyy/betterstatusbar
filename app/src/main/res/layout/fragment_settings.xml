@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginBottom="16dp"
-            android:text="Settings"
+            android:text="@string/settings_title"
             android:textAppearance="?attr/textAppearanceHeadlineMedium" />
 
         <!-- Gesture Settings Card -->
@@ -38,7 +38,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp"
-                    android:text="Core Gestures"
+                    android:text="@string/core_gestures_title"
                     android:textAppearance="?attr/textAppearanceTitleMedium" />
 
                 <!-- Enable Gesture -->
@@ -57,12 +57,12 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Enable gesture"
+                            android:text="@string/enable_gesture_title"
                             android:textAppearance="?attr/textAppearanceBodyLarge" />
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Swipe left to dim, right to brighten"
+                            android:text="@string/enable_gesture_summary"
                             android:textAppearance="?attr/textAppearanceBodySmall"
                             android:textColor="?android:attr/textColorSecondary" />
                     </LinearLayout>
@@ -88,12 +88,12 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Show brightness indicator"
+                            android:text="@string/show_indicator_title"
                             android:textAppearance="?attr/textAppearanceBodyLarge" />
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Displays brightness % while swiping"
+                            android:text="@string/show_indicator_summary"
                             android:textAppearance="?attr/textAppearanceBodySmall"
                             android:textColor="?android:attr/textColorSecondary" />
                     </LinearLayout>
@@ -119,12 +119,12 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Relative adjustment"
+                            android:text="@string/relative_adjustment_title"
                             android:textAppearance="?attr/textAppearanceBodyLarge" />
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Adjust relative to current value"
+                            android:text="@string/relative_adjustment_summary"
                             android:textAppearance="?attr/textAppearanceBodySmall"
                             android:textColor="?android:attr/textColorSecondary" />
                     </LinearLayout>
@@ -154,20 +154,20 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp"
-                    android:text="Feedback &amp; Sensitivity"
+                    android:text="@string/feedback_sensitivity_title"
                     android:textAppearance="?attr/textAppearanceTitleMedium" />
 
                 <!-- Haptic Intensity -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Haptic Intensity"
+                    android:text="@string/haptic_intensity_title"
                     android:textAppearance="?attr/textAppearanceBodyLarge" />
                 <TextView
                     android:id="@+id/txt_haptic_val"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tactile feedback strength"
+                    android:text="@string/haptic_intensity_summary"
                     android:textAppearance="?attr/textAppearanceBodySmall"
                     android:textColor="?android:attr/textColorSecondary" />
                 <com.google.android.material.slider.Slider
@@ -183,13 +183,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Swipe Sensitivity"
+                    android:text="@string/swipe_sensitivity_title"
                     android:textAppearance="?attr/textAppearanceBodyLarge" />
                 <TextView
                     android:id="@+id/txt_sensitivity_val"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Gesture responsiveness"
+                    android:text="@string/swipe_sensitivity_summary"
                     android:textAppearance="?attr/textAppearanceBodySmall"
                     android:textColor="?android:attr/textColorSecondary" />
                 <com.google.android.material.slider.Slider
@@ -209,7 +209,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginBottom="8dp"
-            android:text="Advanced Gestures"
+            android:text="@string/advanced_gestures_title"
             android:textAppearance="?attr/textAppearanceTitleSmall"
             android:textColor="?attr/colorPrimary" />
 
@@ -267,13 +267,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
-                    android:text="How to use"
+                    android:text="@string/how_to_use_title"
                     android:textAppearance="?attr/textAppearanceTitleMedium" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="• Swipe right on the status bar to increase brightness\n• Swipe left to decrease brightness\n• Works with notification shade open or closed\n• Works on the lockscreen\n• The % indicator matches system brightness\n• Configure tap actions above"
+                    android:text="@string/how_to_use_content"
                     android:textAppearance="?attr/textAppearanceBodySmall"
                     android:textColor="?android:attr/textColorSecondary"
                     android:lineSpacingExtra="4dp" />
