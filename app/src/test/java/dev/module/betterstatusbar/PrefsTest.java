@@ -20,4 +20,10 @@ public class PrefsTest {
         assertEquals("Lock Screen", Prefs.getActionLabel(Prefs.ACTION_SYSTEM_LOCK_SCREEN));
         assertEquals("intent:com.android.settings/.Settings", Prefs.getActionLabel("intent:com.android.settings/.Settings"));
     }
+
+    @Test
+    public void testLanguageKeyDefined() {
+        assertNotNull(Prefs.KEY_LANGUAGE);
+        assertEquals("sbbrightness_language", Prefs.KEY_LANGUAGE);
+    }
 }

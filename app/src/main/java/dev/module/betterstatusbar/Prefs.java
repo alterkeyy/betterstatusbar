@@ -17,6 +17,7 @@ public final class Prefs {
     public static final String KEY_HAPTIC_INTENSITY = "sbbrightness_haptic_intensity";
     public static final String KEY_SWIPE_SENSITIVITY = "sbbrightness_swipe_sensitivity";
     public static final String KEY_LOGGING_ENABLED = "sbbrightness_logging_enabled";
+    public static final String KEY_LANGUAGE = "sbbrightness_language";
 
     // ── Gesture Actions ──────────────────────────────────────────────────────
     
