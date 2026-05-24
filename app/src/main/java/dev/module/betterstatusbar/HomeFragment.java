@@ -15,7 +15,7 @@ import androidx.fragment.app.Fragment;
 
 public class HomeFragment extends Fragment {
 
-    private static final String GITHUB_URL = "https://github.com/kingsrepo/betterstatusbar";
+    private static final String GITHUB_URL = "https://github.com/alterkeyy/betterstatusbar";
 
     @Nullable
     @Override
