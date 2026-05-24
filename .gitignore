@@ -6,6 +6,8 @@ app/build/
 
 # Android Studio
 .idea/
+.superpowers
+
 *.iml
 .gradle/
 local.properties
@@ -14,8 +16,12 @@ captures/
 # OS
 .DS_Store
 Thumbs.db
+java_pid21050.hprof
 
 # DOC
 detail.md
+CLAUDE.md
+GEMINI.md
 conductor/
 AppIcons/
+

@@ -1,5 +1,6 @@
 package dev.module.betterstatusbar;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -330,6 +331,7 @@ public class BrightnessGestureHook extends XposedModule {
         }
     }
 
+    @SuppressLint("BlockedPrivateApi")
     private void initDisplayResources(Context context) {
         try {
             if (mMainHandler == null) mMainHandler = new Handler(Looper.getMainLooper());
