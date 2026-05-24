@@ -23,6 +23,8 @@ android {
         targetSdk = 35
         versionCode = commitCount
         versionName = "2.0.${versionCode}"
+
+        resourceConfigurations += listOf("en", "zh-rCN")
     }
 
     signingConfigs {
@@ -37,18 +39,14 @@ android {
         }
     }
 
-    splits {
-        abi {
-            isEnable = true
-            reset()
-            include("x86_64", "arm64-v8a", "armeabi-v7a")
-            isUniversalApk = false
-        }
-    }
+    // No native libraries, so splits are unnecessary.
+    // A single APK will work on all ABIs.
+
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             signingConfig = if (signingConfigs.getByName("release").storeFile != null) {
                 signingConfigs.getByName("release")
             } else {
