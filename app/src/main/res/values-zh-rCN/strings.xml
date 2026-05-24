@@ -54,32 +54,38 @@
     <string name="statusbar_double_tap">状态栏双击</string>
     <string name="statusbar_long_tap">状态栏长按</string>
 
-    <!-- Home -->
+    <!-- Status & Stats -->
     <string name="status_activated">已激活</string>
     <string name="status_not_activated">未激活</string>
-    <string name="gestures_title">手势</string>
-    <string name="haptics_title">触感</string>
-    <string name="enabled">已启用</string>
-    <string name="disabled">已禁用</string>
+    <string name="stat_gestures">手势</string>
+    <string name="stat_haptics">振动</string>
+    <string name="state_enabled">已启用</string>
+    <string name="state_disabled">已禁用</string>
+    
+    <!-- Haptic Levels -->
     <string name="haptic_off">关闭</string>
-    <string name="haptic_subtle">微弱</string>
-    <string name="haptic_normal">普通</string>
+    <string name="haptic_subtle">轻微</string>
+    <string name="haptic_normal">正常</string>
     <string name="haptic_strong">强烈</string>
-    <string name="issues_title">遇到问题？</string>
-    <string name="feedback_github">在 GitHub 上反馈</string>
-    <string name="not_detected">未检测到</string>
+    
+    <!-- Info Rows -->
     <string name="info_build_time">构建时间</string>
-    <string name="info_android_version">Android 版本</string>
+    <string name="info_android_version">安卓版本</string>
     <string name="info_framework">框架</string>
-    <string name="info_libxposed_api">LibXposed API</string>
+    <string name="info_api_version">LibXposed API</string>
     <string name="info_device_model">设备型号</string>
-    <string name="info_system_architecture">系统架构</string>
-
-    <!-- Logs -->
+    <string name="info_architecture">系统架构</string>
+    <string name="info_not_detected">未检测到</string>
+    
+    <!-- Log Fragment -->
     <string name="log_title">活动日志</string>
-    <string name="enable_logging_title">启用日志</string>
-    <string name="enable_logging_summary">记录手势事件到文件</string>
-    <string name="recent_events_title">最近事件</string>
-    <string name="clear">清除</string>
-    <string name="no_logs">暂无日志...</string>
+    <string name="log_enable">启用日志</string>
+    <string name="log_enable_desc">记录手势事件到文件</string>
+    <string name="log_recent_events">最近事件</string>
+    <string name="log_clear">清除</string>
+    <string name="log_empty">暂无日志...</string>
+    
+    <!-- Support -->
+    <string name="support_issues_title">遇到问题？</string>
+    <string name="support_github_feedback">GitHub 反馈</string>
 </resources>

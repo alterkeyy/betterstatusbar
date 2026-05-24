@@ -54,32 +54,38 @@
     <string name="statusbar_double_tap">Status Bar Double Tap</string>
     <string name="statusbar_long_tap">Status Bar Long Tap</string>
 
-    <!-- Home -->
+    <!-- Status & Stats -->
     <string name="status_activated">Activated</string>
     <string name="status_not_activated">Not Activated</string>
-    <string name="gestures_title">Gestures</string>
-    <string name="haptics_title">Haptics</string>
-    <string name="enabled">Enabled</string>
-    <string name="disabled">Disabled</string>
+    <string name="stat_gestures">Gestures</string>
+    <string name="stat_haptics">Haptics</string>
+    <string name="state_enabled">Enabled</string>
+    <string name="state_disabled">Disabled</string>
+    
+    <!-- Haptic Levels -->
     <string name="haptic_off">Off</string>
     <string name="haptic_subtle">Subtle</string>
     <string name="haptic_normal">Normal</string>
     <string name="haptic_strong">Strong</string>
-    <string name="issues_title">Encountered issues?</string>
-    <string name="feedback_github">Feedback on GitHub</string>
-    <string name="not_detected">Not Detected</string>
+    
+    <!-- Info Rows -->
     <string name="info_build_time">Build Time</string>
     <string name="info_android_version">Android Version</string>
     <string name="info_framework">Framework</string>
-    <string name="info_libxposed_api">LibXposed API</string>
+    <string name="info_api_version">LibXposed API</string>
     <string name="info_device_model">Device Model</string>
-    <string name="info_system_architecture">System Architecture</string>
-
-    <!-- Logs -->
+    <string name="info_architecture">System Architecture</string>
+    <string name="info_not_detected">Not Detected</string>
+    
+    <!-- Log Fragment -->
     <string name="log_title">Activity Log</string>
-    <string name="enable_logging_title">Enable Logging</string>
-    <string name="enable_logging_summary">Record gesture events to a file</string>
-    <string name="recent_events_title">Recent Events</string>
-    <string name="clear">Clear</string>
-    <string name="no_logs">No logs yet...</string>
+    <string name="log_enable">Enable Logging</string>
+    <string name="log_enable_desc">Record gesture events to a file</string>
+    <string name="log_recent_events">Recent Events</string>
+    <string name="log_clear">Clear</string>
+    <string name="log_empty">No logs yet...</string>
+    
+    <!-- Support -->
+    <string name="support_issues_title">Encountered issues?</string>
+    <string name="support_github_feedback">Feedback on GitHub</string>
 </resources>
