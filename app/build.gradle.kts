@@ -10,11 +10,27 @@ android {
     }
     
     val commitCount = try {
-        val process = Runtime.getRuntime().exec("git rev-list --count HEAD")
-        process.waitFor()
-        process.inputStream.bufferedReader().readText().trim().toInt()
+        val count = Runtime.getRuntime().exec("git rev-list --count HEAD").let {
+            it.waitFor()
+            it.inputStream.bufferedReader().readText().trim().toInt()
+        }
+        val isDirty = Runtime.getRuntime().exec("git status --porcelain").let {
+            it.waitFor()
+            it.inputStream.bufferedReader().readText().trim().isNotEmpty()
+        }
+        if (isDirty) count + 1 else count
     } catch (e: Exception) {
         1
+    }
+
+    val versionSuffix = try {
+        val isDirty = Runtime.getRuntime().exec("git status --porcelain").let {
+            it.waitFor()
+            it.inputStream.bufferedReader().readText().trim().isNotEmpty()
+        }
+        if (isDirty) "-dirty" else ""
+    } catch (e: Exception) {
+        ""
     }
 
     defaultConfig {
@@ -22,7 +38,7 @@ android {
         minSdk = 33
         targetSdk = 35
         versionCode = commitCount
-        versionName = "2.0.${versionCode}"
+        versionName = "2.0.${commitCount}${versionSuffix}"
 
         resourceConfigurations += listOf("en", "zh-rCN")
     }
