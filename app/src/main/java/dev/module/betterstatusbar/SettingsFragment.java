@@ -35,6 +35,7 @@ public class SettingsFragment extends Fragment {
         setupToggles(view);
         setupSliders(view);
         setupActionRows(view);
+        bindLanguageRow(view.findViewById(R.id.row_language));
 
         return view;
     }
@@ -113,6 +114,60 @@ public class SettingsFragment extends Fragment {
         valView.setText(Prefs.getActionLabel(requireContext(), current));
 
         row.setOnClickListener(v -> showActionDialog(label, key, def, valView));
+    }
+
+    private String getLanguageLabel(String tag) {
+        if (tag == null || tag.isEmpty()) return getString(R.string.language_system_default);
+        if (tag.equals("zh")) return getString(R.string.language_chinese);
+        if (tag.equals("en")) return getString(R.string.language_english);
+        return tag;
+    }
+
+    private void bindLanguageRow(View row) {
+        TextView labelView = row.findViewById(R.id.action_label);
+        TextView valView = row.findViewById(R.id.action_value);
+
+        labelView.setText(R.string.language_title);
+        String current = mPrefs.getString(Prefs.KEY_LANGUAGE, "");
+        valView.setText(getLanguageLabel(current));
+
+        row.setOnClickListener(v -> showLanguageDialog(valView));
+    }
+
+    private void showLanguageDialog(TextView valView) {
+        String[] options = {
+                getString(R.string.language_system_default),
+                getString(R.string.language_chinese),
+                getString(R.string.language_english)
+        };
+        String[] tags = {"", "zh", "en"};
+        String current = mPrefs.getString(Prefs.KEY_LANGUAGE, "");
+
+        int checkedItem = 0;
+        for (int i = 0; i < tags.length; i++) {
+            if (tags[i].equals(current)) {
+                checkedItem = i;
+                break;
+            }
+        }
+
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.language_title)
+                .setSingleChoiceItems(options, checkedItem, (dialog, which) -> {
+                    dialog.dismiss();
+                    String newTag = tags[which];
+                    mPrefs.edit().putString(Prefs.KEY_LANGUAGE, newTag).apply();
+                    valView.setText(getLanguageLabel(newTag));
+
+                    // Apply locale
+                    androidx.core.os.LocaleListCompat appLocales =
+                        newTag.isEmpty() ?
+                        androidx.core.os.LocaleListCompat.getEmptyLocaleList() :
+                        androidx.core.os.LocaleListCompat.forLanguageTags(newTag);
+                    androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(appLocales);
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
     }
 
     private void showActionDialog(String label, String key, String def, TextView valView) {
