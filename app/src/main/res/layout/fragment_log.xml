@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginBottom="16dp"
-        android:text="Activity Log"
+        android:text="@string/log_title"
         android:textAppearance="?attr/textAppearanceHeadlineMedium" />
 
     <com.google.android.material.card.MaterialCardView
@@ -37,12 +37,12 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Enable Logging"
+                    android:text="@string/log_enable"
                     android:textAppearance="?attr/textAppearanceBodyLarge" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Record gesture events to a file"
+                    android:text="@string/log_enable_desc"
                     android:textAppearance="?attr/textAppearanceBodySmall"
                     android:textColor="?android:attr/textColorSecondary" />
             </LinearLayout>
@@ -78,7 +78,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Recent Events"
+                    android:text="@string/log_recent_events"
                     android:textAppearance="?attr/textAppearanceTitleMedium" />
 
                 <com.google.android.material.button.MaterialButton
@@ -86,7 +86,7 @@
                     style="?attr/borderlessButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Clear"
+                    android:text="@string/log_clear"
                     android:textColor="?attr/colorError" />
             </LinearLayout>
 
@@ -100,7 +100,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="monospace"
-                    android:text="No logs yet..."
+                    android:text="@string/log_empty"
                     android:textAppearance="?attr/textAppearanceBodySmall" />
             </ScrollView>
         </LinearLayout>

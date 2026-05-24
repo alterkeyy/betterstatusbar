@@ -16,7 +16,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginBottom="16dp"
-            android:text="StatusBarBrightness"
+            android:text="@string/app_name"
             android:textAppearance="?attr/textAppearanceHeadlineMedium" />
 
         <!-- Status Card -->
@@ -53,14 +53,14 @@
                         android:id="@+id/status_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Activated"
+                        android:text="@string/status_activated"
                         android:textAppearance="?attr/textAppearanceTitleMedium" />
 
                     <TextView
                         android:id="@+id/status_subtitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="v1.0.0-release"
+                        android:text="@string/app_name"
                         android:textAppearance="?attr/textAppearanceBodySmall"
                         android:textColor="?android:attr/textColorSecondary" />
                 </LinearLayout>
@@ -90,14 +90,14 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Gestures"
+                        android:text="@string/stat_gestures"
                         android:textAppearance="?attr/textAppearanceLabelLarge"
                         android:textColor="?attr/colorPrimary" />
                     <TextView
                         android:id="@+id/stat_gestures"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Enabled"
+                        android:text="@string/state_enabled"
                         android:textAppearance="?attr/textAppearanceTitleMedium" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -117,14 +117,14 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Haptics"
+                        android:text="@string/stat_haptics"
                         android:textAppearance="?attr/textAppearanceLabelLarge"
                         android:textColor="?attr/colorPrimary" />
                     <TextView
                         android:id="@+id/stat_haptics"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Normal"
+                        android:text="@string/haptic_normal"
                         android:textAppearance="?attr/textAppearanceTitleMedium" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -173,7 +173,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp"
-                    android:text="Encountered issues?"
+                    android:text="@string/support_issues_title"
                     android:textAppearance="?attr/textAppearanceTitleMedium" />
 
                 <LinearLayout
@@ -189,7 +189,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Feedback on GitHub"
+                            android:text="@string/support_github_feedback"
                             android:textAppearance="?attr/textAppearanceBodyMedium" />
                     </LinearLayout>
 
