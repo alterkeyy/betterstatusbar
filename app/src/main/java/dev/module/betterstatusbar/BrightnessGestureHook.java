@@ -563,7 +563,14 @@ public class BrightnessGestureHook extends XposedModule {
     private boolean handleTouchEvent(MotionEvent ev, boolean isStatusBarView, View view) {
         if (mDisplayManager == null || mScreenWidth == 0) return false;
 
-        if (mGestureDetector != null) {
+        // Determine if this touch sequence started in the status bar region
+        if (ev.getActionMasked() == MotionEvent.ACTION_DOWN) {
+            mTouchStartedInStatusBar = isStatusBarView
+                    || (ev.getY() <= mScreenHeight * STATUS_BAR_Y_FRACTION);
+        }
+
+        // Only process gestures for touches that started in the status bar
+        if (mGestureDetector != null && mTouchStartedInStatusBar) {
             mGestureDetector.onTouchEvent(view, ev);
         }
 
@@ -578,11 +585,8 @@ public class BrightnessGestureHook extends XposedModule {
 
     private boolean onDown(MotionEvent ev, boolean isStatusBarView) {
         mGestureActive = false;
-        mTouchStartedInStatusBar = false;
-        boolean inRegion = isStatusBarView
-                || (ev.getY() <= mScreenHeight * STATUS_BAR_Y_FRACTION);
-        if (!inRegion) return false;
-        mTouchStartedInStatusBar = true;
+        if (!mTouchStartedInStatusBar) return false;
+        
         mDownX = ev.getX();
         mDownY = ev.getY();
         mInitialBrightness = getCurrentBrightness();

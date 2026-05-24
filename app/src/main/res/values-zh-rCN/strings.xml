@@ -12,6 +12,7 @@
     <string name="language_english">英文</string>
 
     <!-- Settings -->
+    <string name="home_title">主页</string>
     <string name="settings_title">设置</string>
     <string name="core_gestures_title">核心手势</string>
     <string name="enable_gesture_title">启用手势</string>

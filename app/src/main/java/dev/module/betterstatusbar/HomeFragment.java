@@ -4,20 +4,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import com.google.android.material.card.MaterialCardView;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
 public class HomeFragment extends Fragment {
 
@@ -29,37 +23,11 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         SharedPreferences prefs = requireContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
 
-        setupStatusCard(view);
         setupStats(view, prefs);
-        setupInfoCard(view);
+        setupVersionInfo(view);
         setupSupportCard(view);
 
         return view;
-    }
-
-    private void setupStatusCard(View view) {
-        ImageView statusIcon = view.findViewById(R.id.status_icon);
-        TextView statusTitle = view.findViewById(R.id.status_title);
-        TextView statusSubtitle = view.findViewById(R.id.status_subtitle);
-
-        SharedPreferences statusPrefs = requireContext().getSharedPreferences(Prefs.LOCAL_PREFS_NAME, Context.MODE_PRIVATE);
-        long lastSeen = statusPrefs.getLong(Prefs.KEY_STATUS_LAST_SEEN, 0);
-        
-        // Consider active if seen in the last 24 hours (usually sent on SystemUI start/hook)
-        boolean active = (System.currentTimeMillis() - lastSeen) < (24 * 60 * 60 * 1000);
-        
-        if (active) {
-            statusTitle.setText(getString(R.string.status_activated));
-            statusIcon.setImageResource(R.drawable.ic_check_circle);
-            statusIcon.setColorFilter(requireContext().getColor(android.R.color.holo_green_dark));
-        } else {
-            statusTitle.setText(getString(R.string.status_not_activated));
-            statusIcon.setImageResource(R.drawable.ic_home);
-            statusIcon.setColorFilter(requireContext().getColor(android.R.color.holo_red_dark));
-        }
-
-        String buildType = BuildConfig.DEBUG ? getString(R.string.build_type_debug) : getString(R.string.build_type_release);
-        statusSubtitle.setText("v" + BuildConfig.VERSION_NAME + "-" + buildType.toLowerCase());
     }
 
     private void setupStats(View view, SharedPreferences prefs) {
@@ -77,34 +45,10 @@ public class HomeFragment extends Fragment {
         statHaptics.setText(getString(hapticLabelRes));
     }
 
-    private void setupInfoCard(View view) {
-        setInfoRow(view.findViewById(R.id.info_build_time), getString(R.string.info_build_time), 
-                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date()));
-        
-        setInfoRow(view.findViewById(R.id.info_android_version), getString(R.string.info_android_version), 
-                Build.VERSION.RELEASE + " (API " + Build.VERSION.SDK_INT + ")");
-
-        SharedPreferences statusPrefs = requireContext().getSharedPreferences(Prefs.LOCAL_PREFS_NAME, Context.MODE_PRIVATE);
-        String framework = statusPrefs.getString(Prefs.KEY_LAST_FRAMEWORK_NAME, getString(R.string.info_not_detected));
-        String version = statusPrefs.getString(Prefs.KEY_LAST_FRAMEWORK_VERSION, "");
-
-        setInfoRow(view.findViewById(R.id.info_lsposed_version), getString(R.string.info_framework), 
-                framework + (version.isEmpty() ? "" : " " + version));
-
-        int apiVersion = statusPrefs.getInt(Prefs.KEY_LAST_API_VERSION, -1);
-        setInfoRow(view.findViewById(R.id.info_lsposed_api), getString(R.string.info_api_version), 
-                apiVersion > 0 ? String.valueOf(apiVersion) : getString(R.string.info_not_detected));
-        
-        setInfoRow(view.findViewById(R.id.info_device_model), getString(R.string.info_device_model), 
-                Build.MANUFACTURER + " " + Build.MODEL + " (" + Build.DEVICE + ")");
-        
-        setInfoRow(view.findViewById(R.id.info_architecture), getString(R.string.info_architecture), 
-                String.join(", ", Build.SUPPORTED_ABIS));
-    }
-
-    private void setInfoRow(View row, String title, String value) {
-        ((TextView) row.findViewById(R.id.row_title)).setText(title);
-        ((TextView) row.findViewById(R.id.row_value)).setText(value);
+    private void setupVersionInfo(View view) {
+        TextView statusSubtitle = view.findViewById(R.id.status_subtitle);
+        String buildType = BuildConfig.DEBUG ? getString(R.string.build_type_debug) : getString(R.string.build_type_release);
+        statusSubtitle.setText("v" + BuildConfig.VERSION_NAME + "-" + buildType.toLowerCase());
     }
 
     private void setupSupportCard(View view) {
