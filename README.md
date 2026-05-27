@@ -1,5 +1,7 @@
 # betterstatusbar
 
+**English** | [简体中文](./README.zh.md)
+
 An LSPosed module that lets you swipe horizontally on the status bar to control screen brightness — works with the notification shade open or closed, and on the lockscreen.
 
 ## New in v2.0.0 (LibXposed)
@@ -20,7 +22,7 @@ An LSPosed module that lets you swipe horizontally on the status bar to control 
 
 ## Installation
 
-1. Install the APK from the [Releases](../../releases) page
+1. Install the APK from the [Releases](https://github.com/parallelcc/MiCTS/releases) page
 2. Open LSPosed → Modules → enable **betterstatusbar**
 3. Ensure the scope includes **System UI**
 4. Reboot
@@ -60,6 +62,7 @@ Open the app to configure:
   - Toggle Dark Mode
   - Toggle Power Saving
   - Lock Screen
+  - to be added ...
 
 ## Compatibility
 
@@ -67,13 +70,13 @@ Works on most AOSP-based Android 13+ ROMs including:
 - Pixel stock (GrapheneOS, CalyxOS)
 - LineageOS and derivatives (crDroid, EvolutionX, DerpFest, etc.)
 
-**Note**: May not work on heavily customized ROMs (Samsung OneUI, Xiaomi HyperOS) as they often replace standard SystemUI status bar classes.
+**Note**: May not work on heavily customized ROMs as they often replace standard SystemUI status bar classes.
 
 ## Tested on
 
-- Pixel 6 (Oriole), DerpFest 16.2, Android 16, LSPosed v1.11.0
+- Samsung tab S8, OneUI 8 Android 16, latest LSPosed v2.0.3
 
-## CI/CD Setup
+## CI/CD Setup(WIP)
 
 This project uses GitHub Actions for automated building, signing, and releasing architecture-specific APKs.
 
@@ -91,7 +94,15 @@ To enable automated signed releases, configure the following secrets in your Git
 - **Pull Requests**: Builds the project to ensure code integrity.
 - **Push to Main**: Builds and signs architecture-specific APKs (x86_64, arm64-v8a, armeabi-v7a), uploading them as workflow artifacts.
 - **Tag (v*)**: Automatically creates a GitHub Release and attaches the signed APKs.
+  
+## Contributing
 
+Feel free to submit Pull Requests or open Issues to discuss new features and bug fixes! 
+
+## Acknowledgments
+
+The creation of this project was made possible by the following outstanding open-source projects.
+[mbatthew/StatusBarBrightnessGesture: LSPosed module — swipe the status bar to control brightness on Android 12+](https://github.com/mbatthew/StatusBarBrightnessGesture)
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/mbatthew/betterstatusbar/blob/cc585c53bd0278cc5114ed39ca640b52e12d057c/LICENSE) file for details.
