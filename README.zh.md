@@ -2,7 +2,7 @@
 
 [English](./README.md) | **简体中文**
 
-一个 LSPosed 模块，允许您通过在状态栏上水平滑动来控制屏幕亮度 — 无论通知栏开启还是关闭，甚至在锁屏界面下均可正常工作。
+一个 LSPosed 模块，原先从 [StatusBarBrightnessGesture](https://github.com/mbatthew/StatusBarBrightnessGesture) fork 而来。允许您通过在状态栏上水平滑动来控制屏幕亮度 — 无论通知栏开启还是关闭，甚至在锁屏界面下均可正常工作。
 
 ## v2.0.0 (LibXposed) 更新内容
 

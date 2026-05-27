@@ -2,7 +2,7 @@
 
 **English** | [简体中文](./README.zh.md)
 
-An LSPosed module that lets you swipe horizontally on the status bar to control screen brightness — works with the notification shade open or closed, and on the lockscreen.
+An LSPosed module, originally forked from [StatusBarBrightnessGesture](https://github.com/mbatthew/StatusBarBrightnessGesture). It lets you swipe horizontally on the status bar to control screen brightness — works with the notification shade open or closed, and on the lockscreen.
 
 ## New in v2.0.0 (LibXposed)
 
@@ -102,7 +102,7 @@ Feel free to submit Pull Requests or open Issues to discuss new features and bug
 ## Acknowledgments
 
 The creation of this project was made possible by the following outstanding open-source projects.
-[mbatthew/StatusBarBrightnessGesture: LSPosed module — swipe the status bar to control brightness on Android 12+](https://github.com/mbatthew/StatusBarBrightnessGesture)
+[mbatthew/StatusBarBrightnessGesture](https://github.com/mbatthew/StatusBarBrightnessGesture)
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/mbatthew/betterstatusbar/blob/cc585c53bd0278cc5114ed39ca640b52e12d057c/LICENSE) file for details.
