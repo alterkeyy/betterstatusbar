@@ -19,6 +19,13 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+import com.google.android.material.color.DynamicColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.slider.Slider;
 
@@ -32,7 +39,7 @@ import com.google.android.material.slider.Slider;
  *   adb shell pm grant dev.module.betterstatusbar android.permission.WRITE_SECURE_SETTINGS
  */
 @SuppressWarnings("deprecation")
-public class SettingsActivity extends Activity {
+public class SettingsActivity extends AppCompatActivity {
 
     private int colText;
     private int colTextSecondary;
@@ -48,10 +55,8 @@ public class SettingsActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        try {
-            Class<?> dc = Class.forName("com.google.android.material.color.DynamicColors");
-            dc.getMethod("applyToActivityIfAvailable", Activity.class).invoke(null, this);
-        } catch (Throwable ignored) {}
+        EdgeToEdge.enable(this);
+        DynamicColors.applyToActivityIfAvailable(this);
 
         super.onCreate(savedInstanceState);
         resolveColours();
@@ -65,10 +70,10 @@ public class SettingsActivity extends Activity {
         scroll.setBackgroundColor(colBackground);
         setContentView(scroll);
 
-        scroll.setOnApplyWindowInsetsListener((v, insets) -> {
-            v.setPadding(v.getPaddingLeft(), insets.getSystemWindowInsetTop(),
-                    v.getPaddingRight(), insets.getSystemWindowInsetBottom());
-            return insets;
+        ViewCompat.setOnApplyWindowInsetsListener(scroll, (v, windowInsets) -> {
+            Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(insets.left, insets.top, insets.right, insets.bottom);
+            return windowInsets;
         });
 
         LinearLayout root = new LinearLayout(this);
