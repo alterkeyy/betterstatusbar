@@ -13,64 +13,75 @@ public class BrightnessCalculatorTest {
 
     @Test
     public void testAbsoluteBrightness() {
-        // 0% position should be MIN
-        assertEquals(MIN, BrightnessCalculator.computeAbsoluteBrightness(0, SCREEN_WIDTH, MIN, MAX, DEFAULT_SENSITIVITY), DELTA);
-        // 100% position should be MAX
-        assertEquals(MAX, BrightnessCalculator.computeAbsoluteBrightness(SCREEN_WIDTH, SCREEN_WIDTH, MIN, MAX, DEFAULT_SENSITIVITY), DELTA);
-        // 50% position should be roughly 0.217 (0.5^2.2)
-        float expected = (float) Math.pow(0.5, 2.2);
-        assertEquals(expected, BrightnessCalculator.computeAbsoluteBrightness(SCREEN_WIDTH / 2, SCREEN_WIDTH, MIN, MAX, DEFAULT_SENSITIVITY), DELTA);
+        assertEquals(MIN, BrightnessCalculator.computeAbsoluteBrightness(0, SCREEN_WIDTH, MIN, MAX), DELTA);
+        assertEquals(MAX, BrightnessCalculator.computeAbsoluteBrightness(SCREEN_WIDTH, SCREEN_WIDTH, MIN, MAX), DELTA);
+        
+        // 25% position (0.25 gamma) -> (0.25/0.5)^2 / 12 = 0.25 / 12 = 0.020833
+        assertEquals(0.020833f, BrightnessCalculator.computeAbsoluteBrightness(SCREEN_WIDTH * 0.25f, SCREEN_WIDTH, MIN, MAX), DELTA);
+        
+        // 50% position (0.5 gamma) -> 1.0 / 12 = 0.08333
+        assertEquals(0.08333f, BrightnessCalculator.computeAbsoluteBrightness(SCREEN_WIDTH * 0.5f, SCREEN_WIDTH, MIN, MAX), DELTA);
+    }
+
+    @Test
+    public void testAbsoluteBrightnessClamping() {
+        assertEquals(MIN, BrightnessCalculator.computeAbsoluteBrightness(-100, SCREEN_WIDTH, MIN, MAX), DELTA);
+        assertEquals(MAX, BrightnessCalculator.computeAbsoluteBrightness(SCREEN_WIDTH * 2, SCREEN_WIDTH, MIN, MAX), DELTA);
     }
 
     @Test
     public void testRelativeBrightness() {
-        // Starting at 50% (initialBrightness is roughly 0.217)
-        float initialBrightness = (float) Math.pow(0.5, 2.2);
-        float initialX = 200; // arbitrary
+        // Start at 0.08333 linear (which is 0.5 gamma)
+        float initialBrightness = 0.08333f;
+        float initialX = 500;
         
-        // Move 10% of screen width right
-        float currentX = initialX + (SCREEN_WIDTH * 0.1f);
-        // Should end up at 60% gamma space -> 0.6^2.2
-        float expected = (float) Math.pow(0.6, 2.2);
-        assertEquals(expected, BrightnessCalculator.computeRelativeBrightness(initialBrightness, initialX, currentX, SCREEN_WIDTH, MIN, MAX, DEFAULT_SENSITIVITY), DELTA);
-        
-        // Move 10% of screen width left
-        currentX = initialX - (SCREEN_WIDTH * 0.1f);
-        // Should end up at 40% gamma space -> 0.4^2.2
-        expected = (float) Math.pow(0.4, 2.2);
+        // Move 25% right -> 0.75 gamma
+        float currentX = initialX + (SCREEN_WIDTH * 0.25f);
+        // gammaToLinear(0.75) = (exp((0.75 - 0.5599) / 0.1788) + 0.2846) / 12 = 0.2649
+        float expected = 0.2649f;
         assertEquals(expected, BrightnessCalculator.computeRelativeBrightness(initialBrightness, initialX, currentX, SCREEN_WIDTH, MIN, MAX, DEFAULT_SENSITIVITY), DELTA);
     }
 
     @Test
-    public void testRelativeBrightnessLimits() {
+    public void testRelativeBrightnessSensitivity() {
+        float initialBrightness = 0.25f;
+        float initialX = 500;
+
+        float halfSensResult = BrightnessCalculator.computeRelativeBrightness(
+                initialBrightness, initialX, initialX + 100, SCREEN_WIDTH, MIN, MAX, 0.5f);
+        float fullSensResult = BrightnessCalculator.computeRelativeBrightness(
+                initialBrightness, initialX, initialX + 100, SCREEN_WIDTH, MIN, MAX, 1.0f);
+        assertTrue("Lower sensitivity should produce smaller change", halfSensResult < fullSensResult);
+
+        float doubleSensResult = BrightnessCalculator.computeRelativeBrightness(
+                initialBrightness, initialX, initialX + 100, SCREEN_WIDTH, MIN, MAX, 2.0f);
+        assertTrue("Higher sensitivity should produce larger change", fullSensResult < doubleSensResult);
+    }
+
+    @Test
+    public void testRelativeBrightnessNegativeDelta() {
         float initialBrightness = 0.5f;
         float initialX = 500;
-        
-        // Move way right
-        float currentX = initialX + SCREEN_WIDTH * 2;
-        assertEquals(MAX, BrightnessCalculator.computeRelativeBrightness(initialBrightness, initialX, currentX, SCREEN_WIDTH, MIN, MAX, DEFAULT_SENSITIVITY), DELTA);
-        
-        // Move way left
-        currentX = initialX - SCREEN_WIDTH * 2;
-        assertEquals(MIN, BrightnessCalculator.computeRelativeBrightness(initialBrightness, initialX, currentX, SCREEN_WIDTH, MIN, MAX, DEFAULT_SENSITIVITY), DELTA);
+        float currentX = 250;
+        float result = BrightnessCalculator.computeRelativeBrightness(
+                initialBrightness, initialX, currentX, SCREEN_WIDTH, MIN, MAX, DEFAULT_SENSITIVITY);
+        assertTrue("Moving left should decrease brightness", result < initialBrightness);
     }
 
     @Test
-    public void testSensitivity() {
-        float initialBrightness = (float) Math.pow(0.5, 2.2);
-        float initialX = 500;
-        
-        // Move 10% of screen width right, but with 200% sensitivity
-        float currentX = initialX + (SCREEN_WIDTH * 0.1f);
-        float sensitivity = 2.0f;
-        // Delta should be treated as 20% -> 50% + 20% = 70% gamma space -> 0.7^2.2
-        float expected = (float) Math.pow(0.7, 2.2);
-        assertEquals(expected, BrightnessCalculator.computeRelativeBrightness(initialBrightness, initialX, currentX, SCREEN_WIDTH, MIN, MAX, sensitivity), DELTA);
-        
-        // Move 10% of screen width right, but with 50% sensitivity
-        sensitivity = 0.5f;
-        // Delta should be treated as 5% -> 50% + 5% = 55% gamma space -> 0.55^2.2
-        expected = (float) Math.pow(0.55, 2.2);
-        assertEquals(expected, BrightnessCalculator.computeRelativeBrightness(initialBrightness, initialX, currentX, SCREEN_WIDTH, MIN, MAX, sensitivity), DELTA);
+    public void testClamping() {
+        float initialBrightness = 0.0f;
+        float initialX = 0;
+        assertEquals(0.0f, BrightnessCalculator.computeRelativeBrightness(initialBrightness, initialX, -100, SCREEN_WIDTH, MIN, MAX, DEFAULT_SENSITIVITY), DELTA);
+        assertEquals(1.0f, BrightnessCalculator.computeRelativeBrightness(initialBrightness, initialX, SCREEN_WIDTH * 2, SCREEN_WIDTH, MIN, MAX, DEFAULT_SENSITIVITY), DELTA);
+    }
+
+    @Test
+    public void testGammaLinearRoundTrip() {
+        for (float x = 0f; x <= 1.0f; x += 0.1f) {
+            float linear = BrightnessCalculator.gammaToLinear(x);
+            float gamma = BrightnessCalculator.linearToGamma(linear);
+            assertEquals("Round trip should be identity for x=" + x, x, gamma, DELTA);
+        }
     }
 }

@@ -59,10 +59,9 @@ public class BrightnessGestureHook extends XposedModule {
     private static final String BRIGHTNESS_UTILS_CLASS =
             "com.android.settingslib.display.BrightnessUtils";
 
-    private static final int GAMMA_SPACE_MAX = 65535;
+    private static final int GAMMA_SPACE_MAX = 1023;
     private static final float STATUS_BAR_Y_FRACTION = 0.06f;
     private static final float HORIZONTAL_RATIO = 2.0f;
-    private static final float GAMMA = 2.2f;
     private static final long INDICATOR_DISMISS_DELAY_MS = 800;
 
     // ── Per-gesture state ─────────────────────────────────────────────────────
@@ -93,7 +92,11 @@ public class BrightnessGestureHook extends XposedModule {
     private Field mBrightnessMaxField;
 
     private final java.util.concurrent.ExecutorService mBgExecutor =
-            Executors.newSingleThreadExecutor();
+            Executors.newSingleThreadExecutor(r -> {
+                Thread t = new Thread(r, "BrightnessGesture-BG");
+                t.setDaemon(true);
+                return t;
+            });
     private Handler mMainHandler;
 
     // ── Indicator ─────────────────────────────────────────────────────────────
@@ -102,6 +105,11 @@ public class BrightnessGestureHook extends XposedModule {
     private WindowManager.LayoutParams mIndicatorParams;
     private boolean mIndicatorAttached = false;
     private final Runnable mDismissIndicator = this::hideIndicator;
+    private final Runnable mUpdateBrightness = this::updateBrightnessInternal;
+    private float mPendingBrightness = -1f;
+    private float mPendingFingerX = -1f;
+    private long mLastUpdateTime = 0;
+    private static final long UPDATE_THROTTLE_MS = 16; // ~60fps
 
     // ── Action Management ─────────────────────────────────────────────────────
 
@@ -124,12 +132,6 @@ public class BrightnessGestureHook extends XposedModule {
     @Override
     public void onModuleLoaded(@NonNull ModuleLoadedParam param) {
         logMsg(TAG + ": module loaded in process: " + param.getProcessName());
-        
-        // Broadcast status to the app
-        if (SYSTEMUI_PACKAGE.equals(param.getProcessName())) {
-             // We'll wait until we have a context in onPackageLoaded or onAttachedToWindow
-             // Actually, we can't easily send broadcast from onModuleLoaded without a context.
-        }
 
         if (param.getProcessName().equals("dev.module.betterstatusbar")) {
             try {
@@ -406,7 +408,9 @@ public class BrightnessGestureHook extends XposedModule {
             intent.setPackage("dev.module.betterstatusbar");
             intent.putExtra(Prefs.EXTRA_LOG_MESSAGE, msg);
             context.sendBroadcast(intent);
-        } catch (Throwable ignored) {}
+        } catch (Throwable t) {
+            logMsg(TAG + ": sendLog failed: " + t);
+        }
     }
 
     private View findTappedView(View root, float x, float y) {
@@ -489,13 +493,24 @@ public class BrightnessGestureHook extends XposedModule {
         catch (Throwable t) { return Color.argb(210, 30, 30, 30); }
     }
 
+    private static final double SRGB_LINEAR_THRESHOLD = 0.03928;
+    private static final double SRGB_GAMMA_OFFSET = 0.055;
+    private static final double SRGB_GAMMA_DIVISOR = 1.055;
+    private static final double SRGB_GAMMA_EXPONENT = 2.4;
+    private static final double LUMA_RED = 0.2126;
+    private static final double LUMA_GREEN = 0.7152;
+    private static final double LUMA_BLUE = 0.0722;
+    private static final double CONTRAST_THRESHOLD = 0.35;
+
     private int getContrastingTextColour(int bg) {
         double r = Color.red(bg)/255.0, g = Color.green(bg)/255.0, b = Color.blue(bg)/255.0;
-        r = r<=0.03928?r/12.92:Math.pow((r+0.055)/1.055, 2.4);
-        g = g<=0.03928?g/12.92:Math.pow((g+0.055)/1.055, 2.4);
-        b = b<=0.03928?b/12.92:Math.pow((b+0.055)/1.055, 2.4);
-        return (0.2126*r + 0.7152*g + 0.0722*b) < 0.35 ? Color.WHITE : Color.BLACK;
+        r = r <= SRGB_LINEAR_THRESHOLD ? r / 12.92 : Math.pow((r + SRGB_GAMMA_OFFSET) / SRGB_GAMMA_DIVISOR, SRGB_GAMMA_EXPONENT);
+        g = g <= SRGB_LINEAR_THRESHOLD ? g / 12.92 : Math.pow((g + SRGB_GAMMA_OFFSET) / SRGB_GAMMA_DIVISOR, SRGB_GAMMA_EXPONENT);
+        b = b <= SRGB_LINEAR_THRESHOLD ? b / 12.92 : Math.pow((b + SRGB_GAMMA_OFFSET) / SRGB_GAMMA_DIVISOR, SRGB_GAMMA_EXPONENT);
+        return (LUMA_RED * r + LUMA_GREEN * g + LUMA_BLUE * b) < CONTRAST_THRESHOLD ? Color.WHITE : Color.BLACK;
     }
+
+    private int mLastIndicatorW = 0;
 
     private void showIndicator(float fingerX, float linearBrightness) {
         if (mIndicatorView == null || mWindowManager == null || mMainHandler == null) return;
@@ -505,13 +520,18 @@ public class BrightnessGestureHook extends XposedModule {
 
         int pct = linearToDisplayPct(linearBrightness);
         mIndicatorView.setText(pct + "%");
-        mIndicatorView.measure(
-                android.view.View.MeasureSpec.makeMeasureSpec(0,
-                        android.view.View.MeasureSpec.UNSPECIFIED),
-                android.view.View.MeasureSpec.makeMeasureSpec(0,
-                        android.view.View.MeasureSpec.UNSPECIFIED));
+        
+        // Only measure if text length likely changed significantly or first time
+        if (mLastIndicatorW == 0 || pct % 10 == 0 || pct < 10 || pct > 90) {
+            mIndicatorView.measure(
+                    android.view.View.MeasureSpec.makeMeasureSpec(0,
+                            android.view.View.MeasureSpec.UNSPECIFIED),
+                    android.view.View.MeasureSpec.makeMeasureSpec(0,
+                            android.view.View.MeasureSpec.UNSPECIFIED));
+            mLastIndicatorW = mIndicatorView.getMeasuredWidth();
+        }
 
-        int viewW   = mIndicatorView.getMeasuredWidth();
+        int viewW   = mLastIndicatorW;
         int yOffset = (int)(mScreenHeight * 0.055f);
         int xOffset = Math.max(4, Math.min(mScreenWidth - viewW - 4,
                 (int)(fingerX - viewW / 2f)));
@@ -543,9 +563,9 @@ public class BrightnessGestureHook extends XposedModule {
         } catch (Throwable ignored) {}
         float range = mBrightnessMax - mBrightnessMin;
         if (range <= 0) return 0;
-        float n = Math.max(0f, Math.min(1f, (linear - mBrightnessMin) / range));
-        return Math.max(0, Math.min(100,
-                Math.round((float) Math.pow(n, 1.0 / GAMMA) * 100f)));
+        float x = Math.max(0f, Math.min(1f, (linear - mBrightnessMin) / range));
+        float res = BrightnessCalculator.linearToGamma(x);
+        return Math.max(0, Math.min(100, Math.round(res * 100f)));
     }
 
     private void hideIndicator() {
@@ -608,9 +628,25 @@ public class BrightnessGestureHook extends XposedModule {
         mHapticHandler.update(view, ev.getX());
 
         float brightness = computeBrightness(ev.getX());
-        setTemporaryBrightness(brightness);
-        showIndicator(ev.getX(), brightness);
+        mPendingBrightness = brightness;
+        mPendingFingerX = ev.getX();
+        
+        long now = System.currentTimeMillis();
+        long elapsed = now - mLastUpdateTime;
+        if (elapsed >= UPDATE_THROTTLE_MS) {
+            mMainHandler.removeCallbacks(mUpdateBrightness);
+            updateBrightnessInternal();
+        } else if (!mMainHandler.hasCallbacks(mUpdateBrightness)) {
+            mMainHandler.postDelayed(mUpdateBrightness, UPDATE_THROTTLE_MS - elapsed);
+        }
         return true;
+    }
+
+    private void updateBrightnessInternal() {
+        if (mPendingBrightness < 0) return;
+        setTemporaryBrightness(mPendingBrightness);
+        showIndicator(mPendingFingerX, mPendingBrightness);
+        mLastUpdateTime = System.currentTimeMillis();
     }
 
     private boolean onUpOrCancel(MotionEvent ev) {
@@ -618,6 +654,8 @@ public class BrightnessGestureHook extends XposedModule {
             mTouchStartedInStatusBar = false;
             return false;
         }
+        mMainHandler.removeCallbacks(mUpdateBrightness);
+        
         boolean cancelled = ev.getActionMasked() == MotionEvent.ACTION_CANCEL;
         float finalBrightness = cancelled
                 ? getCurrentBrightness()
@@ -628,6 +666,7 @@ public class BrightnessGestureHook extends XposedModule {
             mMainHandler.postDelayed(mDismissIndicator, INDICATOR_DISMISS_DELAY_MS);
         mGestureActive = false;
         mTouchStartedInStatusBar = false;
+        mPendingBrightness = -1f;
         return true;
     }
 
@@ -639,7 +678,7 @@ public class BrightnessGestureHook extends XposedModule {
                     mInitialBrightness, mDownX, fingerX, mScreenWidth, mBrightnessMin, mBrightnessMax, sensitivity);
         } else {
             return BrightnessCalculator.computeAbsoluteBrightness(
-                    fingerX, mScreenWidth, mBrightnessMin, mBrightnessMax, sensitivity);
+                    fingerX, mScreenWidth, mBrightnessMin, mBrightnessMax);
         }
     }
 
