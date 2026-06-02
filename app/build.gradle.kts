@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace = "dev.module.betterstatusbar"
-    compileSdk = 35
+    compileSdk = 36
     buildFeatures {
         buildConfig = true
     }
@@ -36,7 +36,7 @@ android {
     defaultConfig {
         applicationId = "dev.module.betterstatusbar"
         minSdk = 33
-        targetSdk = 35
+        targetSdk = 36
         versionCode = commitCount
         versionName = "2.0.${commitCount}${versionSuffix}"
 
