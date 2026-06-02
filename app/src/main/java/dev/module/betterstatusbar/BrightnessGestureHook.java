@@ -436,28 +436,41 @@ public class BrightnessGestureHook extends XposedModule {
             if (display == null) return;
             Object info = mGetBrightnessInfoMethod.invoke(display);
             if (info == null) return;
-            Class<?> cls = info.getClass();
-            if (mBrightnessMinField == null) {
-                mBrightnessField    = cls.getField("brightness");
-                mBrightnessMinField = cls.getField("brightnessMinimum");
-                mBrightnessMaxField = cls.getField("brightnessMaximum");
-            }
-            mBrightnessMin = (float) mBrightnessMinField.get(info);
-            mBrightnessMax = (float) mBrightnessMaxField.get(info);
             
-            // Valid range check
+            mBrightnessMin = getFloatSafe(info, "brightnessMinimum", 0.0f);
+            mBrightnessMax = getFloatSafe(info, "brightnessMaximum", 1.0f);
+            
             if (mBrightnessMax <= mBrightnessMin) {
-                logMsg(TAG + ": invalid range detected: [" + mBrightnessMin + ", " + mBrightnessMax + "], resetting to [0, 1]");
                 mBrightnessMin = 0.0f;
                 mBrightnessMax = 1.0f;
-            } else {
-                logMsg(TAG + ": range updated: [" + mBrightnessMin + ", " + mBrightnessMax + "]");
             }
+            logMsg(TAG + ": range updated: [" + mBrightnessMin + ", " + mBrightnessMax + "]");
         } catch (Throwable t) {
             mBrightnessMin = 0.0f;
             mBrightnessMax = 1.0f;
             logMsg(TAG + ": readBrightnessRange fallback: " + t);
         }
+    }
+
+    private float getFloatSafe(Object obj, String fieldName, float def) {
+        try {
+            Field f;
+            if (fieldName.equals("brightness")) {
+                if (mBrightnessField == null) mBrightnessField = obj.getClass().getField(fieldName);
+                f = mBrightnessField;
+            } else if (fieldName.equals("brightnessMinimum")) {
+                if (mBrightnessMinField == null) mBrightnessMinField = obj.getClass().getField(fieldName);
+                f = mBrightnessMinField;
+            } else if (fieldName.equals("brightnessMaximum")) {
+                if (mBrightnessMaxField == null) mBrightnessMaxField = obj.getClass().getField(fieldName);
+                f = mBrightnessMaxField;
+            } else {
+                f = obj.getClass().getField(fieldName);
+            }
+            Object val = f.get(obj);
+            if (val instanceof Number) return ((Number) val).floatValue();
+        } catch (Throwable ignored) {}
+        return def;
     }
 
     private void initIndicator(Context context) {
@@ -521,29 +534,48 @@ public class BrightnessGestureHook extends XposedModule {
 
     private int mLastIndicatorW = 0;
 
-    private void showIndicator(float fingerX, float linearBrightness) {
+    private int linearToDisplayPct(float linear) {
+        float min = mBrightnessMin;
+        float max = mBrightnessMax;
+        if (max <= min) { min = 0f; max = 1f; }
+
+        float x;
+        if (linear > max && max <= 1.0f) {
+            if (linear <= 255.5f) x = linear / 255f;
+            else if (linear <= 1023.5f) x = linear / 1023f;
+            else x = 1.0f;
+        } else {
+            x = (linear - min) / (max - min);
+        }
+        
+        float normalized = Math.max(0f, Math.min(1f, x));
+        return Math.max(0, Math.min(100, Math.round(BrightnessCalculator.linearToGamma(normalized) * 100f)));
+    }
+
+    private void showIndicator(float fingerX, float targetValue) {
         if (mIndicatorView == null || mWindowManager == null || mMainHandler == null) return;
         if (!mOverlayEnabled) return;
 
         mMainHandler.removeCallbacks(mDismissIndicator);
 
-        int pct = linearToDisplayPct(linearBrightness);
+        float systemVal = getCurrentBrightness();
+        // If system hasn't updated yet (same as initial), or we're in a fast gesture, use targetValue for smoothness
+        float displayVal = (mGestureActive && Math.abs(systemVal - mInitialBrightness) < 0.0001f) 
+                ? targetValue : systemVal;
+
+        int pct = linearToDisplayPct(displayVal);
         mIndicatorView.setText(pct + "%");
         
-        // Only measure if text length likely changed significantly or first time
         if (mLastIndicatorW == 0 || pct % 10 == 0 || pct < 10 || pct > 90) {
             mIndicatorView.measure(
-                    android.view.View.MeasureSpec.makeMeasureSpec(0,
-                            android.view.View.MeasureSpec.UNSPECIFIED),
-                    android.view.View.MeasureSpec.makeMeasureSpec(0,
-                            android.view.View.MeasureSpec.UNSPECIFIED));
+                    android.view.View.MeasureSpec.makeMeasureSpec(0, android.view.View.MeasureSpec.UNSPECIFIED),
+                    android.view.View.MeasureSpec.makeMeasureSpec(0, android.view.View.MeasureSpec.UNSPECIFIED));
             mLastIndicatorW = mIndicatorView.getMeasuredWidth();
         }
 
         int viewW   = mLastIndicatorW;
         int yOffset = (int)(mScreenHeight * 0.055f);
-        int xOffset = Math.max(4, Math.min(mScreenWidth - viewW - 4,
-                (int)(fingerX - viewW / 2f)));
+        int xOffset = Math.max(4, Math.min(mScreenWidth - viewW - 4, (int)(fingerX - viewW / 2f)));
 
         mIndicatorParams.x = xOffset;
         mIndicatorParams.y = yOffset;
@@ -556,24 +588,7 @@ public class BrightnessGestureHook extends XposedModule {
                 mWindowManager.updateViewLayout(mIndicatorView, mIndicatorParams);
             }
             mIndicatorView.setAlpha(1f);
-        } catch (Throwable t) {
-            logMsg(TAG + ": showIndicator failed: " + t);
-        }
-    }
-
-    private int linearToDisplayPct(float linear) {
-        float min = mBrightnessMin;
-        float max = mBrightnessMax;
-        
-        // Sanity check: if range is invalid, fallback to 0-1
-        if (max <= min) {
-            min = 0.0f;
-            max = 1.0f;
-        }
-        
-        float x = Math.max(0f, Math.min(1f, (linear - min) / (max - min)));
-        float res = BrightnessCalculator.linearToGamma(x);
-        return Math.max(0, Math.min(100, Math.round(res * 100f)));
+        } catch (Throwable ignored) {}
     }
 
     private void hideIndicator() {
@@ -670,6 +685,7 @@ public class BrightnessGestureHook extends XposedModule {
                 : computeBrightness(ev.getX());
         setTemporaryBrightness(finalBrightness);
         commitBrightness(finalBrightness);
+        showIndicator(ev.getX(), finalBrightness); // Show final value
         if (mMainHandler != null)
             mMainHandler.postDelayed(mDismissIndicator, INDICATOR_DISMISS_DELAY_MS);
         mGestureActive = false;
