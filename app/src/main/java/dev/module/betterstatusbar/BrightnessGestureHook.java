@@ -444,6 +444,15 @@ public class BrightnessGestureHook extends XposedModule {
             }
             mBrightnessMin = (float) mBrightnessMinField.get(info);
             mBrightnessMax = (float) mBrightnessMaxField.get(info);
+            
+            // Valid range check
+            if (mBrightnessMax <= mBrightnessMin) {
+                logMsg(TAG + ": invalid range detected: [" + mBrightnessMin + ", " + mBrightnessMax + "], resetting to [0, 1]");
+                mBrightnessMin = 0.0f;
+                mBrightnessMax = 1.0f;
+            } else {
+                logMsg(TAG + ": range updated: [" + mBrightnessMin + ", " + mBrightnessMax + "]");
+            }
         } catch (Throwable t) {
             mBrightnessMin = 0.0f;
             mBrightnessMax = 1.0f;
@@ -553,17 +562,16 @@ public class BrightnessGestureHook extends XposedModule {
     }
 
     private int linearToDisplayPct(float linear) {
-        try {
-            if (mConvertLinearToGammaMethod != null) {
-                int gammaVal = (int) mConvertLinearToGammaMethod.invoke(
-                        null, linear, mBrightnessMin, mBrightnessMax);
-                return Math.max(0, Math.min(100,
-                        Math.round((float) gammaVal / GAMMA_SPACE_MAX * 100f)));
-            }
-        } catch (Throwable ignored) {}
-        float range = mBrightnessMax - mBrightnessMin;
-        if (range <= 0) return 0;
-        float x = Math.max(0f, Math.min(1f, (linear - mBrightnessMin) / range));
+        float min = mBrightnessMin;
+        float max = mBrightnessMax;
+        
+        // Sanity check: if range is invalid, fallback to 0-1
+        if (max <= min) {
+            min = 0.0f;
+            max = 1.0f;
+        }
+        
+        float x = Math.max(0f, Math.min(1f, (linear - min) / (max - min)));
         float res = BrightnessCalculator.linearToGamma(x);
         return Math.max(0, Math.min(100, Math.round(res * 100f)));
     }
