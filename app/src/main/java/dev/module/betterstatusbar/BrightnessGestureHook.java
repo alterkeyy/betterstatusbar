@@ -723,13 +723,14 @@ public class BrightnessGestureHook extends XposedModule {
     }
 
     private float getCurrentBrightness() {
+        if (mBrightnessMin < 0) readBrightnessRange();
         try {
-            if (mGetBrightnessInfoMethod == null || mBrightnessField == null) return 0.5f;
+            if (mGetBrightnessInfoMethod == null) return (mBrightnessMin + mBrightnessMax) / 2f;
             Display display = mDisplayManager.getDisplay(Display.DEFAULT_DISPLAY);
-            if (display == null) return 0.5f;
+            if (display == null) return (mBrightnessMin + mBrightnessMax) / 2f;
             Object info = mGetBrightnessInfoMethod.invoke(display);
-            if (info == null) return 0.5f;
-            float b = (float) mBrightnessField.get(info);
+            if (info == null) return (mBrightnessMin + mBrightnessMax) / 2f;
+            float b = getFloatSafe(info, "brightness", (mBrightnessMin + mBrightnessMax) / 2f);
             return Math.max(mBrightnessMin, Math.min(mBrightnessMax, b));
         } catch (Throwable t) { return 0.5f; }
     }
