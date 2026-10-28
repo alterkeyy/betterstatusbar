@@ -4,7 +4,7 @@
 This repository contains an Android application functioning as an LSPosed module. The module enables users to control screen brightness by swiping horizontally across the status bar. It works on the lockscreen and functions independently of the notification shade's state.
 
 Key features and interactions:
-- Connects to SystemUI via LibXposed (API 101) hooks.
+- Connects to SystemUI via LibXposed (API 102) hooks.
 - Hooks primarily into `PhoneStatusBarView` and `NotificationShadeWindowView`.
 - Interfaces with Android's `DisplayManager` and `WindowManager` via reflection to dynamically adjust device brightness.
 

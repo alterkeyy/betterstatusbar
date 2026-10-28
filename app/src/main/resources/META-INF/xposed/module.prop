@@ -1,7 +1,5 @@
-name=betterstatusbar
-description=Swipe on status bar to adjust brightness.
-version=2.0.0
-versionCode=8
-minApi=101
-targetApiVersion=101
+minApiVersion=102
+targetApiVersion=102
 staticScope=false
+# SystemUI receivers, handlers and gesture state require a process restart.
+autoHotReload=false

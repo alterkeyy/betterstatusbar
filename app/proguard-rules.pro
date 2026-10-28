@@ -2,7 +2,7 @@
 # LSPosed module ProGuard rules
 # ============================================================
 
-# The hook class is referenced by name in assets/xposed_init.
+# The hook class is referenced by name in META-INF/xposed/java_init.list.
 # LSPosed finds it via Class.forName() at runtime, so its name
 # must never be obfuscated or removed.
 -keep class dev.module.betterstatusbar.BrightnessGestureHook { *; }
@@ -18,12 +18,12 @@
 -keep public class * extends android.content.ContentProvider
 -keep public class * extends androidx.fragment.app.Fragment
 
-# Keep all LibXposed API classes (compileOnly, but some might be present or used in checks)
--keep class io.github.libxposed.api.** { *; }
+# LibXposed API is compileOnly and supplied by the framework at runtime.
+# Its API-version annotations are not needed in the APK.
+-dontwarn io.github.libxposed.annotation.**
 
 # Resource adaptation
--adaptresourcefilenames META-INF/xposed/java_init.list
--adaptresourcefilenames META-INF/xposed/native_init.list
+-adaptresourcefilecontents META-INF/xposed/java_init.list
 
 # BrightnessInfo is accessed via Display.getBrightnessInfo() — keep its fields.
 -keep class android.hardware.display.BrightnessInfo { *; }
@@ -31,4 +31,3 @@
 # Naming and Obfuscation
 # Enabling obfuscation can significantly reduce size. 
 # We keep the entry points above.
-

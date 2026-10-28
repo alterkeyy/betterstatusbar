@@ -3,7 +3,7 @@ agp = "9.1.0"
 junit = "4.13.2"
 mockito = "5.11.0"
 # LibXposed API — Modern Xposed API
-libxposed-api = "101.0.1"
+libxposed-api = "102.0.0"
 
 [libraries]
 # LibXposed API (compileOnly — provided by LSPosed at runtime)

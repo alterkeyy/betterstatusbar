@@ -14,11 +14,13 @@
 - **滑动灵敏度**：微调改变亮度所需的水平滑动距离。
 - **手势日志**：内置日志查看器，用于调试手势检测和偏好设置更新。
 
+**2.1.121** 版本使用 **LibXposed API 102**（`io.github.libxposed:api:102.0.0`），需要提供 API 102 或更高版本的框架。更新模块后请重启作用域内的进程或重启设备；当前未启用模块热重载。
+
 ## 运行要求
 
 - **Android 13** 或更高版本 (SDK 33+)
 - [Magisk](https://github.com/topjohnwu/Magisk) (已植入 root 权限)
-- [LSPosed v1.9.3+](https://github.com/LSPosed/LSPosed) 或其他兼容 LibXposed 的框架
+- 提供 **LibXposed API 102 或更高版本**的 LSPosed 或其他框架
 
 ## 安装方法
 
@@ -72,9 +74,11 @@ adb shell pm grant dev.module.betterstatusbar android.permission.WRITE_SECURE_SE
 
 **注意**：可能不适用于高度定制的 ROM（如 MIUI/HyperOS, OriginOS 等），因为它们通常替换了标准的 SystemUI 状态栏类。
 
-## 已测试环境
+## 历史测试环境（API 102 迁移前）
 
 - Samsung Tab S8, OneUI 8 Android 16, 最新版 LSPosed v2.0.3
+
+API 102 迁移后的版本仍需在支持 API 102 的框架上完成实机验证。
 
 ## CI/CD 设置 (进行中)
 

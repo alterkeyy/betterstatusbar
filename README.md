@@ -4,6 +4,8 @@
 
 An LSPosed module, originally forked from [StatusBarBrightnessGesture](https://github.com/mbatthew/StatusBarBrightnessGesture). It lets you swipe horizontally on the status bar to control screen brightness — works with the notification shade open or closed, and on the lockscreen.
 
+Version **2.1.121** uses **LibXposed API 102** (`io.github.libxposed:api:102.0.0`) and requires a framework providing API 102 or higher. Restart the scoped processes or reboot after updating; module hot reload is not enabled.
+
 ## New in v2.0.0 (LibXposed)
 
 - **Migrated to LibXposed (API 101)**: Improved performance and better compatibility with modern LSPosed versions.
@@ -18,7 +20,7 @@ An LSPosed module, originally forked from [StatusBarBrightnessGesture](https://g
 
 - **Android 13** or higher (SDK 33+)
 - [Magisk](https://github.com/topjohnwu/Magisk) (rooted device)
-- [LSPosed v1.9.3+](https://github.com/LSPosed/LSPosed) or other LibXposed-compatible framework
+- LSPosed or another framework providing **LibXposed API 102 or higher**
 
 ## Installation
 
@@ -72,9 +74,11 @@ Works on most AOSP-based Android 13+ ROMs including:
 
 **Note**: May not work on heavily customized ROMs as they often replace standard SystemUI status bar classes.
 
-## Tested on
+## Previously tested on (before API 102 migration)
 
 - Samsung tab S8, OneUI 8 Android 16, latest LSPosed v2.0.3
+
+The API 102 migration still requires device validation with an API 102-compatible framework.
 
 ## CI/CD Setup(WIP)
 

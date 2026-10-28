@@ -38,7 +38,7 @@ android {
         minSdk = 33
         targetSdk = 36
         versionCode = commitCount
-        versionName = "2.0.${commitCount}${versionSuffix}"
+        versionName = "2.1.${commitCount}${versionSuffix}"
 
         resourceConfigurations += listOf("en", "zh-rCN")
     }
