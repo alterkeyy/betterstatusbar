@@ -24,7 +24,7 @@
 
 ## 安装方法
 
-1. 从 [Releases](https://github.com/parallelcc/MiCTS/releases) 页面安装 APK。
+1. 从 [Releases](https://github.com/alterkeyy/betterstatusbar/releases) 页面安装 APK。
 2. 打开 LSPosed → 模块 → 启用 **betterstatusbar**。
 3. 确保作用域包含 **系统界面 (System UI)**。
 4. 重启设备。
