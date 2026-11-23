@@ -24,7 +24,7 @@ Version **2.1.121** uses **LibXposed API 102** (`io.github.libxposed:api:102.0.0
 
 ## Installation
 
-1. Install the APK from the [Releases](https://github.com/parallelcc/MiCTS/releases) page
+1. Install the APK from the [Releases](https://github.com/alterkeyy/betterstatusbar/releases) page
 2. Open LSPosed → Modules → enable **betterstatusbar**
 3. Ensure the scope includes **System UI**
 4. Reboot
